@@ -922,6 +922,9 @@ function AdminPanelScreen({user,onBack}){
   const [saving,setSaving]=useState(false);
   const [sessions,setSessions]=useState([]);
   const [toast,setToast]=useState("");
+  const [bulkSheet,setBulkSheet]=useState(false);
+  const [bulkText,setBulkText]=useState("");
+  const [bulkImporting,setBulkImporting]=useState(false);
 
   useEffect(()=>{loadEvents();},[]);
   useEffect(()=>{if(tab==="stats")loadStats();},[tab]);
@@ -937,6 +940,47 @@ function AdminPanelScreen({user,onBack}){
   }
 
   function showToast(msg){setToast(msg);setTimeout(()=>setToast(""),2200);}
+
+  const VALID_TYPES=Object.keys(SLOK_TYPES);
+  const VALID_CATS=Object.keys(CATEGORIES);
+
+  function parseBulkLine(line){
+    const parts=line.split("|").map(s=>s.trim());
+    const rawLabel=parts[0]||"";
+    // Detect leading emoji: first "word" is emoji if it starts with a non-ASCII/non-letter char
+    let emoji="⚽",label=rawLabel.trim();
+    const firstWordEnd=rawLabel.search(/\s/);
+    if(firstWordEnd>0){
+      const firstWord=rawLabel.slice(0,firstWordEnd);
+      if(firstWord.length>0&&/[^\w]/.test(firstWord[0])){
+        emoji=firstWord;label=rawLabel.slice(firstWordEnd).trim();
+      }
+    }
+    if(!label)return null;
+    const slokRaw=parseInt(parts[1]);
+    const slok=isNaN(slokRaw)?1:slokRaw;
+    const typeRaw=(parts[2]||"").toLowerCase();
+    const slok_type=VALID_TYPES.includes(typeRaw)?typeRaw:"slok";
+    const catRaw=(parts[3]||"").toLowerCase().trim();
+    const category=VALID_CATS.includes(catRaw)?catRaw:(catFilter!=="all"?catFilter:"veld");
+    return{emoji,label,slok,slok_type,category,description:"",vibrate:false,is_rare:false,active:true,sort_order:99};
+  }
+
+  function getBulkPreview(){
+    return bulkText.split("\n").map(l=>l.trim()).filter(Boolean).map(parseBulkLine).filter(Boolean);
+  }
+
+  async function doBulkImport(){
+    const rows=getBulkPreview();
+    if(!rows.length)return;
+    setBulkImporting(true);
+    await sb.from("wk_events").insert(rows);
+    await loadEvents();
+    setBulkImporting(false);
+    setBulkSheet(false);
+    setBulkText("");
+    showToast(`✅ ${rows.length} vakjes toegevoegd`);
+  }
 
   async function saveEdit(){
     if(!editEv)return;
@@ -1015,6 +1059,11 @@ function AdminPanelScreen({user,onBack}){
             ))}
           </div>
         </div>
+        <button onClick={()=>setBulkSheet(true)}
+          style={{flexShrink:0,height:32,borderRadius:16,background:"#1a1a1a",border:"1px solid #333",
+            color:"#aaa",fontSize:11,fontWeight:700,cursor:"pointer",padding:"0 10px",whiteSpace:"nowrap"}}>
+          📋 Bulk
+        </button>
         <button onClick={addEvent}
           style={{flexShrink:0,width:40,height:40,borderRadius:20,background:"var(--g)",border:"none",
             color:"#000",fontSize:22,fontWeight:900,cursor:"pointer",display:"flex",alignItems:"center",
@@ -1085,6 +1134,73 @@ function AdminPanelScreen({user,onBack}){
       ))}
     </>}
     </div>
+
+    {/* Bulk import sheet */}
+    {bulkSheet&&(()=>{
+      const preview=getBulkPreview();
+      return <div style={{position:"fixed",inset:0,zIndex:900,background:"#000a",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+        onClick={()=>setBulkSheet(false)}>
+        <div onClick={e=>e.stopPropagation()}
+          style={{background:"#131313",borderRadius:"20px 20px 0 0",borderTop:"1px solid #2a2a2a",
+            padding:"20px 20px 40px",width:"100%",maxWidth:480,maxHeight:"92vh",overflowY:"auto"}}>
+          <div className="row gap10" style={{marginBottom:14}}>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:800,fontSize:17}}>📋 Bulk Vakjes Toevoegen</div>
+              <div style={{fontSize:12,color:"#555",marginTop:2}}>Één vakje per regel</div>
+            </div>
+            <button onClick={()=>setBulkSheet(false)} style={{background:"none",border:"none",color:"#555",fontSize:22,cursor:"pointer"}}>✕</button>
+          </div>
+
+          <div style={{background:"#0e0e0e",border:"1px solid #2a2a2a",borderRadius:10,padding:"10px 12px",marginBottom:12,fontSize:11,color:"#555",lineHeight:1.7}}>
+            <div style={{color:"#888",fontWeight:700,marginBottom:4}}>Formaat (alles na label is optioneel):</div>
+            <div style={{fontFamily:"monospace",color:"#aaa"}}>
+              emoji label | slokken | type | categorie
+            </div>
+            <div style={{fontFamily:"monospace",color:"#666",marginTop:2}}>
+              ⚽ Doelpunt | 2 | slok | veld<br/>
+              🟥 Rode kaart | 0 | adje | veld<br/>
+              Wissel | 1 | slok | trainer
+            </div>
+            <div style={{marginTop:6}}>
+              <span style={{color:"#555"}}>Types: </span>
+              <span style={{color:"#888"}}>{Object.entries(SLOK_TYPES).map(([k,v])=>k).join(" · ")}</span>
+            </div>
+            <div>
+              <span style={{color:"#555"}}>Cats: </span>
+              <span style={{color:"#888"}}>{VALID_CATS.join(" · ")}</span>
+            </div>
+          </div>
+
+          <textarea
+            className="inp"
+            rows={8}
+            placeholder={"⚽ Doelpunt gescoord | 2 | slok | veld\n🟥 Rode kaart | 0 | adje | veld\nEigen doelpunt | 0 | dubbel_adje | veld"}
+            value={bulkText}
+            onChange={e=>setBulkText(e.target.value)}
+            style={{resize:"vertical",fontFamily:"monospace",fontSize:13,marginBottom:12,lineHeight:1.6}}
+          />
+
+          {preview.length>0&&<>
+            <div className="neon-lbl mb8">VOORBEELD ({preview.length} vakjes)</div>
+            <div style={{maxHeight:200,overflowY:"auto",marginBottom:16,display:"flex",flexDirection:"column",gap:5}}>
+              {preview.map((ev,i)=>{
+                const cc=catColor[ev.category]||"#555";
+                return <div key={i} style={{background:"#1a1a1a",borderRadius:8,padding:"7px 10px",display:"flex",alignItems:"center",gap:8,fontSize:13}}>
+                  <span style={{fontSize:18,flexShrink:0}}>{ev.emoji}</span>
+                  <span style={{flex:1,fontWeight:600}}>{ev.label}</span>
+                  <span style={{fontSize:11,color:SLOK_TYPES[ev.slok_type]?.color||"var(--y)",flexShrink:0}}>{slokLabel(ev)}</span>
+                  <span style={{fontSize:10,color:cc,flexShrink:0,textTransform:"uppercase",letterSpacing:1}}>{ev.category}</span>
+                </div>;
+              })}
+            </div>
+            <button className="btn btn-green btn-block" onClick={doBulkImport} disabled={bulkImporting}>
+              {bulkImporting?`Bezig…`:`✅ ${preview.length} Vakjes Importeren`}
+            </button>
+          </>}
+          {!preview.length&&bulkText.trim()&&<div style={{color:"var(--r)",fontSize:13}}>Geen geldige regels gevonden. Controleer het formaat.</div>}
+        </div>
+      </div>;
+    })()}
 
     {/* Edit sheet */}
     {editEv&&<div style={{position:"fixed",inset:0,zIndex:900,background:"#000a",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
@@ -1406,90 +1522,151 @@ function CreateSessionScreen({onBack,onCreate,authUser}){
 
 // ── CardApproval ──────────────────────────────────────────────────────────────
 function CardApprovalScreen({sess,players,allEvents,onDone}){
+  const gs=sess.grid_size||4;
+  const [currentIdx,setCurrentIdx]=useState(0);
   const [cards,setCards]=useState(()=>players.reduce((m,p)=>({...m,[p.id]:[...(p.card||[])]}),{}));
   const [approved,setApproved]=useState({});
-  const [swapping,setSwapping]=useState(null); // {playerId, idx}
   const [saving,setSaving]=useState({});
-
-  function pickSwap(playerId,idx){
-    setSwapping(s=>s?.playerId===playerId&&s?.idx===idx?null:{playerId,idx});
-  }
-
-  async function replaceVakje(ev){
-    if(!swapping)return;
-    const{playerId,idx}=swapping;
-    const newCard=[...(cards[playerId]||[])];
-    newCard[idx]=ev;
-    setCards(c=>({...c,[playerId]:newCard}));
-    setApproved(a=>({...a,[playerId]:false}));
-    setSwapping(null);
-  }
-
-  async function approveCard(p){
-    setSaving(s=>({...s,[p.id]:true}));
-    await sb.from("wk_players").update({card:cards[p.id],card_approved:true}).eq("id",p.id);
-    setApproved(a=>({...a,[p.id]:true}));
-    setSaving(s=>({...s,[p.id]:false}));
-  }
+  const [replaceSheet,setReplaceSheet]=useState(null); // {playerId,cellIdx}
+  const [search,setSearch]=useState("");
+  const [touchStartX,setTouchStartX]=useState(null);
 
   const allApproved=players.every(p=>approved[p.id]);
+  const approvedCount=Object.values(approved).filter(Boolean).length;
+  const p=players[currentIdx]||players[0];
+  const C=COLORS[p?.color]||COLORS.groen;
+  const card=p?cards[p.id]||[]:[];
 
-  return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
-    <div style={{padding:"16px 16px 12px",borderBottom:"1px solid #1e1e1e"}}>
-      <div className="anto" style={{fontSize:20,color:"var(--y)"}}>📋 Kaarten Keuren</div>
-      <div style={{fontSize:12,color:"#555",marginTop:2}}>Tik een vakje aan om het te vervangen. Keur elke kaart goed.</div>
+  const filtered=allEvents.filter(e=>!search||e.label.toLowerCase().includes(search.toLowerCase())||e.emoji?.includes(search));
+
+  async function approveCard(player){
+    setSaving(s=>({...s,[player.id]:true}));
+    await sb.from("wk_players").update({card:cards[player.id],card_approved:true}).eq("id",player.id);
+    setApproved(a=>({...a,[player.id]:true}));
+    setSaving(s=>({...s,[player.id]:false}));
+    const next=players.findIndex((pp,i)=>i>currentIdx&&!approved[pp.id]);
+    if(next>=0)setCurrentIdx(next);
+    else if(currentIdx<players.length-1)setCurrentIdx(i=>Math.min(i+1,players.length-1));
+  }
+
+  function replaceCell(ev){
+    if(!replaceSheet)return;
+    const{playerId,cellIdx}=replaceSheet;
+    const newCard=[...(cards[playerId]||[])];
+    newCard[cellIdx]=ev;
+    setCards(c=>({...c,[playerId]:newCard}));
+    setApproved(a=>({...a,[playerId]:false}));
+    setReplaceSheet(null);
+    setSearch("");
+  }
+
+  function onTouchStart(e){setTouchStartX(e.touches[0].clientX);}
+  function onTouchEnd(e){
+    if(touchStartX===null)return;
+    const dx=touchStartX-e.changedTouches[0].clientX;
+    if(Math.abs(dx)>50){
+      if(dx>0&&currentIdx<players.length-1)setCurrentIdx(i=>i+1);
+      else if(dx<0&&currentIdx>0)setCurrentIdx(i=>i-1);
+    }
+    setTouchStartX(null);
+  }
+
+  if(!p)return null;
+
+  return <div className="screen" style={{background:"#0a0a0a"}}>
+    {/* Header */}
+    <div style={{padding:"16px 16px 12px",borderBottom:"1px solid #1e1e1e",flexShrink:0}}>
+      <div className="row gap12" style={{marginBottom:10}}>
+        <button className="btn btn-ghost btn-sm" onClick={onDone}>← Terug</button>
+        <div style={{flex:1}}>
+          <div className="anto" style={{fontSize:18,color:"var(--y)"}}>📋 Kaarten Keuren</div>
+          <div style={{fontSize:11,color:"#555"}}>{approvedCount}/{players.length} goedgekeurd · swipe om te wisselen</div>
+        </div>
+      </div>
+      {/* Nav dots */}
+      <div style={{display:"flex",justifyContent:"center",gap:6}}>
+        {players.map((pp,i)=>(
+          <div key={pp.id} onClick={()=>setCurrentIdx(i)}
+            style={{width:i===currentIdx?24:8,height:8,borderRadius:4,cursor:"pointer",transition:"all .2s",
+              background:approved[pp.id]?"var(--g)":i===currentIdx?"var(--y)":"#333"}}/>
+        ))}
+      </div>
     </div>
 
-    <div style={{flex:1,overflow:"auto",padding:"12px 16px"}}>
-      {players.map(p=>{
-        const C=COLORS[p.color]||COLORS.groen;
-        const card=cards[p.id]||[];
-        const isApproved=approved[p.id];
-        return <div key={p.id} className={`approval-card${isApproved?" approved":""}`}>
-          <div className="row gap8 mb8">
-            <PlayerAvatar p={p} size={32}/>
-            <div style={{flex:1,fontWeight:700}}>{p.name}</div>
-            {isApproved
-              ? <span className="pill pill-green">✓ Goedgekeurd</span>
-              : <button className="btn btn-sm btn-green" onClick={()=>approveCard(p)} disabled={saving[p.id]}>
-                  {saving[p.id]?"…":"✓ Akkoord"}
-                </button>}
+    {/* Scrollable card area with swipe */}
+    <div style={{flex:1,overflow:"auto",padding:"12px 16px 16px"}} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      {/* Player header row */}
+      <div className="row gap10" style={{marginBottom:10}}>
+        <PlayerAvatar p={p} size={36}/>
+        <div style={{flex:1}}>
+          <div style={{fontWeight:800,fontSize:16,color:C.a}}>{p.name}</div>
+          <div style={{fontSize:11,color:"#555"}}>{COLORS[p.color]?.lbl}</div>
+        </div>
+        {currentIdx>0&&<button className="btn btn-ghost btn-sm" onClick={()=>setCurrentIdx(i=>i-1)}>‹</button>}
+        {currentIdx<players.length-1&&<button className="btn btn-ghost btn-sm" onClick={()=>setCurrentIdx(i=>i+1)}>›</button>}
+      </div>
+      <div style={{fontSize:11,color:"#555",textAlign:"center",marginBottom:8}}>Tik op een vakje om het te vervangen</div>
+
+      {/* Full-size bingo card */}
+      <div className={`bingo-grid-${gs}`}>
+        {card.map((ev,i)=>(
+          <div key={(ev?.id||i)+"_"+i} className="cell"
+            style={{background:C.cell,borderColor:ev?.is_rare?"var(--y)":C.bd,color:C.tx,cursor:"pointer"}}
+            onClick={()=>setReplaceSheet({playerId:p.id,cellIdx:i})}>
+            <div className="cell-emoji">{ev?.emoji||"⚽"}</div>
+            <div className="cell-label">{ev?.label}</div>
+            <div className="cell-slok" style={{color:slokColor(ev||{})}}>{slokLabel(ev||{slok:1,slok_type:"slok"})}</div>
           </div>
-          <div className="mini-grid">
-            {card.map((ev,i)=>{
-              const isSel=swapping?.playerId===p.id&&swapping?.idx===i;
-              return <div key={i} className={`mini-cell${isSel?" selected-swap":""}`}
-                style={{background:C.cell,borderColor:isSel?"var(--y)":C.bd,color:C.tx}}
-                onClick={()=>pickSwap(p.id,i)}>
-                <span style={{fontSize:13}}>{ev.emoji||"⚽"}</span>
-                <span style={{fontSize:7,lineHeight:1.2,maxWidth:50,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{ev.label}</span>
-              </div>;
-            })}
-          </div>
-          {swapping?.playerId===p.id&&<>
-            <div style={{fontSize:11,color:"var(--y)",fontWeight:700,margin:"8px 0 6px"}}>Kies een vervangend vakje:</div>
-            <div style={{maxHeight:200,overflow:"auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-              {allEvents.map(ev=>(
-                <button key={ev.id} style={{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:8,padding:"6px 8px",color:"#fff",fontSize:11,textAlign:"left",cursor:"pointer",display:"flex",gap:6,alignItems:"center"}}
-                  onClick={()=>replaceVakje(ev)}>
-                  <span>{ev.emoji}</span>
-                  <span style={{flex:1,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{ev.label}</span>
-                </button>
-              ))}
-            </div>
-          </>}
-        </div>;
-      })}
+        ))}
+      </div>
     </div>
 
-    <div style={{padding:"12px 16px",borderTop:"1px solid #1e1e1e"}}>
-      <button className="btn btn-green btn-block" onClick={onDone} disabled={!allApproved}>
-        {allApproved?"⚽ Start het Spel →":"Keur alle kaarten goed om te starten"}
-      </button>
-      <button className="btn btn-ghost btn-block btn-sm" style={{marginTop:8}} onClick={onDone}>
+    {/* Bottom approve bar */}
+    <div style={{padding:"12px 16px",borderTop:"1px solid #1e1e1e",flexShrink:0}}>
+      {approved[p.id]
+        ? <div style={{textAlign:"center",color:"var(--g)",fontWeight:700,padding:"12px 0"}}>✓ Goedgekeurd</div>
+        : <button className="btn btn-green btn-block" onClick={()=>approveCard(p)} disabled={saving[p.id]}>
+            {saving[p.id]?"Opslaan…":"✓ Kaart Goedkeuren"}
+          </button>}
+      {allApproved&&<button className="btn btn-gold btn-block" style={{marginTop:10,fontSize:16}} onClick={onDone}>
+        ⚽ Start het Spel →
+      </button>}
+      {!allApproved&&<button className="btn btn-ghost btn-block btn-sm" style={{marginTop:8}} onClick={onDone}>
         Overslaan (start zonder keuring)
-      </button>
+      </button>}
     </div>
+
+    {/* Replace bottom sheet */}
+    {replaceSheet&&(
+      <div style={{position:"fixed",inset:0,zIndex:1000,background:"#000a",display:"flex",alignItems:"flex-end"}}
+        onClick={()=>{setReplaceSheet(null);setSearch("");}}>
+        <div style={{background:"#131313",borderRadius:"20px 20px 0 0",borderTop:"1px solid #2a2a2a",
+          padding:"20px 16px 40px",width:"100%",maxWidth:480,margin:"0 auto",maxHeight:"75vh",display:"flex",flexDirection:"column"}}
+          onClick={e=>e.stopPropagation()}>
+          <div className="row gap10" style={{marginBottom:12}}>
+            <div style={{fontWeight:800,fontSize:16,flex:1}}>🔄 Vervang Vakje</div>
+            <button onClick={()=>{setReplaceSheet(null);setSearch("");}} style={{background:"none",border:"none",color:"#555",fontSize:22,cursor:"pointer"}}>✕</button>
+          </div>
+          <input className="inp inp-sm" value={search} onChange={e=>setSearch(e.target.value)}
+            placeholder="Zoek vakje…" style={{marginBottom:12}} autoFocus/>
+          <div style={{flex:1,overflowY:"auto"}}>
+            {filtered.map(ev=>(
+              <div key={ev.id}
+                style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
+                  borderRadius:10,cursor:"pointer",marginBottom:4,background:"#1a1a1a"}}
+                onClick={()=>replaceCell(ev)}>
+                <span style={{fontSize:22}}>{ev.emoji}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:13}}>{ev.label}</div>
+                  <div style={{fontSize:11,color:"#555"}}>{CATEGORIES[ev.category]?.lbl||ev.category}</div>
+                </div>
+                <span style={{fontSize:12,color:slokColor(ev),fontWeight:700}}>{slokLabel(ev)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
   </div>;
 }
 
@@ -1501,6 +1678,8 @@ function HostLobbyScreen({sess,players,me,onStart,onUpdate,onEnd,addToast}){
   const [copied,setCopied]=useState(false);
   const [confirmClose,setConfirmClose]=useState(false);
   const [showApproval,setShowApproval]=useState(false);
+  const [approvalPlayers,setApprovalPlayers]=useState([]);
+  const [showPredictions,setShowPredictions]=useState(false);
   const [allEvents,setAllEvents]=useState([]);
 
   const url=`${location.origin}${location.pathname}?join=${sess.id}`;
@@ -1533,8 +1712,10 @@ function HostLobbyScreen({sess,players,me,onStart,onUpdate,onEnd,addToast}){
   }
 
   if(showApproval) return <CardApprovalScreen
-    sess={sess} players={players.filter(p=>!p.is_host)} allEvents={allEvents}
+    sess={sess} players={approvalPlayers} allEvents={allEvents}
     onDone={()=>{setShowApproval(false);startGame();}}/>;
+
+  if(showPredictions) return <PredictionsScreen sess={sess} player={me} onDone={()=>setShowPredictions(false)}/>;
 
   return <div className="screen" style={{background:"#0a0a0a",padding:"16px 16px 32px"}}>
     <div className="row gap12 mb16">
@@ -1578,8 +1759,17 @@ function HostLobbyScreen({sess,players,me,onStart,onUpdate,onEnd,addToast}){
     </div>}
 
     <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:10}}>
+      {(sess.predictions_config||[]).length>0&&<button className="btn btn-ghost btn-block btn-sm"
+        style={{borderColor:"var(--p)33",color:"var(--p)"}}
+        onClick={()=>setShowPredictions(true)}>
+        🔮 Mijn Voorspellingen Invullen
+      </button>}
       <button className="btn btn-ghost btn-block"
-        onClick={()=>setShowApproval(true)}
+        onClick={async()=>{
+          const{data}=await sb.from("wk_players").select("*").eq("session_id",sess.id).eq("is_host",false);
+          setApprovalPlayers(data||players.filter(p=>!p.is_host));
+          setShowApproval(true);
+        }}
         disabled={players.filter(p=>!p.is_host).length===0}
         style={{opacity:players.filter(p=>!p.is_host).length===0?.4:1}}>
         📋 Kaarten Keuren & Aanpassen
@@ -1732,6 +1922,55 @@ function PlayerSetupScreen({sess,onBack,onJoin,authUser}){
   </div>;
 }
 
+// ── QuestionInput — defined outside PredictionsScreen to prevent focus loss ────
+function QuestionInput({q,val,onChange,teamA,teamB}){
+  if(q.type==="team"){
+    const opts=[teamA,teamB,"Gelijkspel"];
+    return <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+      {opts.map(o=><button key={o}
+        style={{flex:1,minWidth:80,padding:"10px 8px",borderRadius:10,border:`2px solid ${val===o?"var(--g)":"#2a2a2a"}`,
+          background:val===o?"#0e1a0e":"#131313",color:val===o?"var(--g)":"#888",
+          fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
+        onClick={()=>onChange(o)}>{o}</button>)}
+    </div>;
+  }
+  if(q.type==="yesno"){
+    return <div style={{display:"flex",gap:10}}>
+      {["Ja","Nee"].map(o=><button key={o}
+        style={{flex:1,padding:"12px",borderRadius:10,border:`2px solid ${val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#2a2a2a"}`,
+          background:val===o?(o==="Ja"?"#0e1a0e":"#1a0200"):"#131313",
+          color:val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#888",
+          fontWeight:800,fontSize:16,cursor:"pointer",transition:"all .15s"}}
+        onClick={()=>onChange(o)}>{o==="Ja"?"✅ Ja":"❌ Nee"}</button>)}
+    </div>;
+  }
+  if(q.type==="choice"){
+    return <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+      {(q.choices||[]).map(o=><button key={o}
+        style={{padding:"8px 14px",borderRadius:8,border:`2px solid ${val===o?"var(--y)":"#2a2a2a"}`,
+          background:val===o?"#1a1400":"#131313",color:val===o?"var(--y)":"#888",
+          fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
+        onClick={()=>onChange(o)}>{o}</button>)}
+    </div>;
+  }
+  if(q.type==="score"){
+    return <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <input type="number" min={0} max={20} value={val.split("-")[0]||""}
+        onChange={e=>onChange(e.target.value+"-"+(val.split("-")[1]||"0"))}
+        style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
+          fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
+      <span style={{fontSize:22,color:"#555",fontWeight:800}}>–</span>
+      <input type="number" min={0} max={20} value={val.split("-")[1]||""}
+        onChange={e=>onChange((val.split("-")[0]||"0")+"-"+e.target.value)}
+        style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
+          fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
+      <div style={{fontSize:12,color:"#555",lineHeight:1.3}}>{teamA}<br/>{teamB}</div>
+    </div>;
+  }
+  return <input className="inp inp-sm" value={val} placeholder={q.hint||"Jouw antwoord"}
+    onChange={e=>onChange(e.target.value)}/>;
+}
+
 // ── PredictionsScreen ─────────────────────────────────────────────────────────
 function PredictionsScreen({sess,player,onDone}){
   const questions=(sess.predictions_config||[]).map(id=>PREDICTION_QUESTIONS.find(q=>q.id===id)).filter(Boolean);
@@ -1751,60 +1990,6 @@ function PredictionsScreen({sess,player,onDone}){
   function setAns(id,val){setAnswers(a=>({...a,[id]:val}));}
   const allAnswered=questions.every(q=>(answers[q.id]||"").trim());
 
-  function QuestionInput({q}){
-    const val=answers[q.id]||"";
-    // Team choice
-    if(q.type==="team"){
-      const opts=[teamA,teamB,"Gelijkspel"];
-      return <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {opts.map(o=><button key={o}
-          style={{flex:1,minWidth:80,padding:"10px 8px",borderRadius:10,border:`2px solid ${val===o?"var(--g)":"#2a2a2a"}`,
-            background:val===o?"#0e1a0e":"#131313",color:val===o?"var(--g)":"#888",
-            fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
-          onClick={()=>setAns(q.id,o)}>{o}</button>)}
-      </div>;
-    }
-    // Ja/Nee
-    if(q.type==="yesno"){
-      return <div style={{display:"flex",gap:10}}>
-        {["Ja","Nee"].map(o=><button key={o}
-          style={{flex:1,padding:"12px",borderRadius:10,border:`2px solid ${val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#2a2a2a"}`,
-            background:val===o?(o==="Ja"?"#0e1a0e":"#1a0200"):"#131313",
-            color:val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#888",
-            fontWeight:800,fontSize:16,cursor:"pointer",transition:"all .15s"}}
-          onClick={()=>setAns(q.id,o)}>{o==="Ja"?"✅ Ja":"❌ Nee"}</button>)}
-      </div>;
-    }
-    // Multiple choice
-    if(q.type==="choice"){
-      return <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-        {(q.choices||[]).map(o=><button key={o}
-          style={{padding:"8px 14px",borderRadius:8,border:`2px solid ${val===o?"var(--y)":"#2a2a2a"}`,
-            background:val===o?"#1a1400":"#131313",color:val===o?"var(--y)":"#888",
-            fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
-          onClick={()=>setAns(q.id,o)}>{o}</button>)}
-      </div>;
-    }
-    // Score (e.g. "2-1")
-    if(q.type==="score"){
-      return <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <input type="number" min={0} max={20} value={val.split("-")[0]||""}
-          onChange={e=>setAns(q.id,e.target.value+"-"+(val.split("-")[1]||"0"))}
-          style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
-            fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
-        <span style={{fontSize:22,color:"#555",fontWeight:800}}>–</span>
-        <input type="number" min={0} max={20} value={val.split("-")[1]||""}
-          onChange={e=>setAns(q.id,(val.split("-")[0]||"0")+"-"+e.target.value)}
-          style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
-            fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
-        <div style={{fontSize:12,color:"#555",lineHeight:1.3}}>{teamA}<br/>{teamB}</div>
-      </div>;
-    }
-    // Default: text
-    return <input className="inp inp-sm" value={val} placeholder={q.hint||"Jouw antwoord"}
-      onChange={e=>setAns(q.id,e.target.value)}/>;
-  }
-
   return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
     <div style={{padding:"16px 16px 12px",borderBottom:"1px solid #1e1e1e"}}>
       <div className="anto" style={{fontSize:22,color:"var(--y)"}}>🔮 Voorspellingen</div>
@@ -1822,7 +2007,7 @@ function PredictionsScreen({sess,player,onDone}){
             </div>
             {answered&&<div style={{marginLeft:"auto",color:"var(--g)",fontSize:18}}>✓</div>}
           </div>
-          <QuestionInput q={q}/>
+          <QuestionInput q={q} val={answers[q.id]||""} onChange={v=>setAns(q.id,v)} teamA={teamA} teamB={teamB}/>
         </div>;
       })}
       <div style={{color:"#555",fontSize:12,textAlign:"center",margin:"12px 0"}}>
@@ -1929,9 +2114,19 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
           const prev=sess.host_alert;
           if(!prev||ns.host_alert.ts>prev.ts){
             const ha=ns.host_alert;
-            // Full-screen drink alert for adje/iedereen events (only for non-triggering players)
-            if(ha.type&&ha.playerName!==me?.name){
+            // Full-screen drink alert for adje/iedereen/bingo events
+            if(ha.type==="bingo"){
+              showDrinkAlert(ha.label,ha.playerName,ha.playerColor,"#0a1f00",4000);
+            } else if(ha.type&&ha.playerName!==me?.name){
               showDrinkAlert(ha.label,ha.playerName,ha.playerColor,ha.bg||"#2a0000",3500);
+              if(ha.type==="iedereen_adje"){
+                setMe(prev=>{
+                  if(!prev)return prev;
+                  const newSlok=(prev.total_slok||0)+ADJE_VAL;
+                  sb.from("wk_players").update({total_slok:newSlok}).eq("id",prev.id);
+                  return {...prev,total_slok:newSlok};
+                });
+              }
             } else if(!ha.type){
               setHostAlert(ha);
               setTimeout(()=>setHostAlert(null),6000);
@@ -1980,16 +2175,16 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
     // Drink alerts — broadcast to all via host_alert
     if(ev.slok_type==="adje_iedereen"){
       sAdje();
-      showDrinkAlert("IEDEREEN EEN ADJE! 🍺",me.name,C.a,"#2a0000",3500);
-      await sb.from("wk_sessions").update({host_alert:{type:"iedereen_adje",label:"IEDEREEN EEN ADJE! 🍺",playerName:me.name,playerColor:C.a,bg:"#2a0000",ts:Date.now()}}).eq("id",sess.id);
+      showDrinkAlert(`IEDEREEN EEN ADJE! 🍺\n${ADJE_VAL} slokken`,me.name,C.a,"#2a0000",3500);
+      await sb.from("wk_sessions").update({host_alert:{type:"iedereen_adje",label:`IEDEREEN EEN ADJE! 🍺\n${ADJE_VAL} slokken`,playerName:me.name,playerColor:C.a,bg:"#2a0000",ts:Date.now()}}).eq("id",sess.id);
     } else if(ev.slok_type==="dubbel_adje"){
       sAdje();
-      showDrinkAlert(`💀 ${me.name} DUBBEL ADJE!`,me.name,C.a,"#1a0030",4000);
-      await sb.from("wk_sessions").update({host_alert:{type:"dubbel_adje",label:`💀 ${me.name} — DUBBEL ADJE!`,playerName:me.name,playerColor:C.a,bg:"#1a0030",ts:Date.now()}}).eq("id",sess.id);
+      showDrinkAlert(`💀 ${me.name} DUBBEL ADJE!\n${ADJE_VAL*2} slokken`,me.name,C.a,"#1a0030",4000);
+      await sb.from("wk_sessions").update({host_alert:{type:"dubbel_adje",label:`💀 ${me.name} — DUBBEL ADJE!\n${ADJE_VAL*2} slokken`,playerName:me.name,playerColor:C.a,bg:"#1a0030",ts:Date.now()}}).eq("id",sess.id);
     } else if(ev.slok_type==="adje"){
       sAdje();
-      showDrinkAlert(`🍺 ${me.name} — ADJE!`,me.name,C.a,"#2a0800",3200);
-      await sb.from("wk_sessions").update({host_alert:{type:"adje",label:`🍺 ${me.name} — ADJE!`,playerName:me.name,playerColor:C.a,bg:"#2a0800",ts:Date.now()}}).eq("id",sess.id);
+      showDrinkAlert(`🍺 ${me.name} — ADJE!\n${ADJE_VAL} slokken`,me.name,C.a,"#2a0800",3200);
+      await sb.from("wk_sessions").update({host_alert:{type:"adje",label:`🍺 ${me.name} — ADJE!\n${ADJE_VAL} slokken`,playerName:me.name,playerColor:C.a,bg:"#2a0800",ts:Date.now()}}).eq("id",sess.id);
     }
     if(ev.label.toLowerCase().includes("doelpunt")||ev.label.toLowerCase().includes("goal")){
       setGoalBanner(true);sGoal();confetti(70,C.a);
@@ -2001,7 +2196,9 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
         setFlashCells(fc=>{const s=new Set(fc);s.add(i);return s;});
         setTimeout(()=>setFlashCells(fc=>{const s=new Set(fc);s.delete(i);return s;}),700);
       }));
-      addToast(`🏆 BINGO! ${newLines.length>1?"Meerdere rijen!":""}`,{dur:4000,color:C.a});
+      const bingoLabel=`🏆 ${me.name} heeft BINGO!\nIedereen 2 slokken!`;
+      showDrinkAlert(bingoLabel,me.name,C.a,"#0a1f00",4000);
+      await sb.from("wk_sessions").update({host_alert:{type:"bingo",label:bingoLabel,playerName:me.name,playerColor:C.a,ts:Date.now()}}).eq("id",sess.id);
     }
     if(ev.slok_type==="uitdelen") setUitdelenSheet({idx,ev,slok:ev.slok||2});
 
@@ -2060,6 +2257,27 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
     addToast(`Extra vakje toegevoegd aan ${target.name}!`,{dur:3000,color:"var(--y)"});
   }
 
+  async function reloadCard(){
+    const{data}=await sb.from("wk_players").select("*").eq("id",me.id).single();
+    if(data?.card?.length){
+      setMe(prev=>({...prev,card:data.card,counts:data.counts||prev.counts}));
+      addToast("✅ Kaart geladen!",{dur:2000,color:"var(--g)"});
+    } else {
+      addToast("Geen kaart gevonden in database",{dur:2500,color:"var(--r)"});
+    }
+  }
+
+  async function addExtraVakjeAllen(){
+    if(!allEvents.length)return;
+    const ev=allEvents[Math.floor(Math.random()*allEvents.length)];
+    const nonHosts=players.filter(p=>!p.is_host);
+    await Promise.all(nonHosts.map(p=>{
+      const extra=[...(p.extra_vakjes||[]),ev];
+      return sb.from("wk_players").update({extra_vakjes:extra}).eq("id",p.id);
+    }));
+    addToast(`⭐ "${ev.label}" als extra vakje aan iedereen!`,{dur:3500,color:"var(--y)"});
+  }
+
   async function tapExtra(ev,idx){
     sClick();
     if(ev.vibrate)buzz([150,50,150]);
@@ -2085,6 +2303,11 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
         <div className="match-name">{sess.match_name||"⚽ WK Bingo 2026"}</div>
       </div>
       {sess.match_score&&<div className="match-score">{sess.match_score}</div>}
+      <button onClick={e=>{e.stopPropagation();reloadCard();}}
+        style={{background:"#1a1a00",border:"1px solid var(--y)",borderRadius:8,padding:"4px 8px",
+          color:"var(--y)",fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>
+        ↺ Kaart laden
+      </button>
       <div className="sess-code"><span className="sess-code-lbl">CODE</span><span className="sess-code-val">{code}</span></div>
     </div>
     <div className="player-bar">
@@ -2203,6 +2426,7 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
       <div className="section">
         <div className="neon-lbl mb8">EXTRA VAKJE</div>
         <button className="btn btn-ghost btn-block btn-sm" onClick={()=>setExtraSheet(true)}>⭐ Extra Vakje aan Speler</button>
+        <button className="btn btn-ghost btn-block btn-sm" style={{marginTop:6,borderColor:"var(--y)33",color:"var(--y)"}} onClick={addExtraVakjeAllen}>⭐ Random Extra Vakje aan Iedereen</button>
       </div>
       <div className="section">
         <div className="neon-lbl mb8">LIVE KAARTEN SPELERS</div>
@@ -2279,7 +2503,7 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
     {drinkAlert&&<div className={`drink-alert${drinkOut?" drink-alert-out":""}`} style={{background:drinkAlert.bg||"#2a0000"}}
       onClick={()=>{setDrinkOut(true);setTimeout(()=>setDrinkAlert(null),280);}}>
       <div style={{fontSize:80}}>🍺</div>
-      <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:32,color:drinkAlert.playerColor||"#fff",textAlign:"center",lineHeight:1.1}}>
+      <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:32,color:drinkAlert.playerColor||"#fff",textAlign:"center",lineHeight:1.1,whiteSpace:"pre-line"}}>
         {drinkAlert.label}
       </div>
       <div style={{fontSize:14,color:"#ffffff88",marginTop:8}}>Tik om te sluiten</div>
@@ -2354,19 +2578,20 @@ function WinnerScreen({sess,players,me,onHome,onRematch}){
     </div>
 
     <div className="podium-wrap" style={{marginBottom:24}}>
-      {[1,0,2].map(pos=>{
+      {[1,0,2].map((pos,colIdx)=>{
         const p=top[pos];
         if(!p)return <div key={pos} style={{flex:1}}/>;
-        const heights=[90,120,70];
+        const colHeights=[90,120,70]; // links=90, midden=120(hoogst), rechts=70
+        const rankMedals=["🥇","🥈","🥉"]; // rang 0=goud, 1=zilver, 2=brons
         const C2=COLORS[p.color]||COLORS.groen;
         return <div key={p.id} className="podium-col">
           <div style={{fontSize:28}}>{p.avatar||"⚽"}</div>
           <div style={{fontSize:12,fontWeight:800,color:C2.a,textAlign:"center"}}>{p.name}</div>
-          <div style={{background:C2.a,borderRadius:"8px 8px 0 0",width:"100%",height:heights[pos],display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:8}}>
+          <div style={{background:C2.a,borderRadius:"8px 8px 0 0",width:"100%",height:colHeights[colIdx],display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:8}}>
             <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:20,color:C2.bg}}>🍺 {p.total_slok||0}</div>
             <div style={{fontSize:10,color:C2.bg,opacity:.8}}>slokken</div>
           </div>
-          <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:22,color:C2.a,textAlign:"center"}}>{["🥈","🥇","🥉"][pos]}</div>
+          <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:22,color:C2.a,textAlign:"center"}}>{rankMedals[pos]}</div>
         </div>;
       })}
     </div>
