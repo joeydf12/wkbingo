@@ -1909,8 +1909,9 @@ function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}
         if(eventType==="DELETE"){setPlayers(p=>p.filter(x=>x.id!==or?.id));return;}
         if(nr.id===me.id){
           if(nr.is_kicked){alert("Je bent verwijderd door de host.");onEnd();return;}
-          // Update own player — keep local version if it's newer (optimistic updates), but always sync host-set fields
-          setMe(prev=>(nr.version||0)>=(prev.version||0)?nr:{...prev,extra_vakjes:nr.extra_vakjes,predictions:nr.predictions});
+          // Update own player — keep local version if it's newer (optimistic updates), but always sync host-set fields.
+          // Always preserve prev.card: card never changes during play and nr.card can be null if the DB row was patched without card.
+          setMe(prev=>(nr.version||0)>=(prev.version||0)?{...nr,card:prev.card||nr.card}:{...prev,extra_vakjes:nr.extra_vakjes,predictions:nr.predictions});
           setPlayers(prev=>prev.map(p=>p.id===nr.id?nr:p));
           return;
         }
