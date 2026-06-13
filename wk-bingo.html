@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WK Bingo">
+<title>⚽ WK Bingo 2026</title>
+<link rel="manifest" id="pwa-manifest">
+<script>
+(function(){
+  const m={name:"WK Bingo 2026",short_name:"WKBingo",theme_color:"#0a0a0a",background_color:"#0a0a0a",display:"standalone",orientation:"portrait",start_url:"./",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a'/><text y='.9em' font-size='80'>⚽</text></svg>",sizes:"any",type:"image/svg+xml"}]};
+  try{const u=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/json"}));document.getElementById("pwa-manifest").href=u;}catch(e){}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root{--r:#e8380d;--g:#22c55e;--b:#38bdf8;--y:#facc15;--p:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;-webkit-text-size-adjust:100%}
+body{background:#0a0a0a;font-family:'Inter','Segoe UI',system-ui,sans-serif;overflow-x:hidden;color:#fff;font-size:15px}
+.anto{font-family:'Anton',Impact,'Arial Narrow',sans-serif;letter-spacing:1px}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;font-family:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;outline:none}
+input:focus,select:focus{border-color:#555!important}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:#0d0d0d}
+::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+
+/* ── Animations ── */
+@keyframes pop       {0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+@keyframes fadeUp    {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp   {from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn    {from{opacity:0}to{opacity:1}}
+@keyframes toastIn   {from{opacity:0;transform:translateX(70px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastDrop {from{opacity:0;transform:translateY(-24px) translateX(-50%)}to{opacity:1;transform:translateY(0) translateX(-50%)}}
+@keyframes confFall  {0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes shimmer   {0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes rowFlash  {0%,100%{filter:brightness(1)}20%{filter:brightness(2.2) saturate(2)}50%{filter:brightness(1.6)}75%{filter:brightness(2) saturate(1.8)}}
+@keyframes goldPulse {0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,0)}50%{box-shadow:0 0 12px 3px rgba(250,204,21,0.55)}}
+@keyframes adjeFlash {0%{background:rgba(232,56,13,0)}30%{background:rgba(232,56,13,0.75)}100%{background:rgba(232,56,13,0)}}
+@keyframes goalBoom  {0%{opacity:0;transform:translateX(-50%) scale(0.4)}60%{transform:translateX(-50%) scale(1.12)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+@keyframes liveBlip  {0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin      {to{transform:rotate(360deg)}}
+@keyframes alertDrop {from{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes cardFlip  {0%{transform:perspective(600px) rotateY(0)}40%{transform:perspective(600px) rotateY(90deg);opacity:.2}60%{transform:perspective(600px) rotateY(-90deg);opacity:.2}100%{transform:perspective(600px) rotateY(0);opacity:1}}
+
+.row-flash{animation:rowFlash .7s ease-in-out}
+.card-flip{animation:cardFlip .55s ease-in-out}
+
+/* ── Skeleton ── */
+.sk{background:linear-gradient(90deg,#181818 25%,#252525 50%,#181818 75%);background-size:400px 100%;animation:shimmer 1.3s infinite;border-radius:8px}
+
+/* ── Overlay / Sheet ── */
+.overlay{position:fixed;inset:0;background:#000a;z-index:300;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .18s}
+.sheet{background:#131313;border-radius:20px 20px 0 0;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;padding:20px 16px 48px;animation:slideUp .22s;border-top:1px solid #222}
+.sheet::-webkit-scrollbar{display:none}
+.sheet-center{background:#131313;border-radius:20px;width:calc(100% - 32px);max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 16px 24px;animation:fadeUp .22s;border:1px solid #1e1e1e;align-self:center}
+
+/* ── Inputs ── */
+.inp{display:block;width:100%;background:#1c1c1c;border:1.5px solid #2a2a2a;border-radius:10px;padding:12px 14px;color:#fff;font-size:15px;font-weight:600;transition:border-color .15s}
+.inp::placeholder{color:#555}
+.inp:focus{border-color:#444}
+.inp-sm{padding:8px 10px;font-size:14px}
+
+/* ── Buttons ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:14px 20px;font-weight:800;font-size:15px;transition:opacity .12s,transform .1s;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn-green{background:var(--g);color:#fff}
+.btn-gold{background:var(--y);color:#000}
+.btn-red{background:var(--r);color:#fff}
+.btn-ghost{background:transparent;border:1.5px solid #2a2a2a;color:#888}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+/* ── Tags / Pills ── */
+.pill{display:inline-flex;align-items:center;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:800;white-space:nowrap}
+.pill-green{background:#0f1f0f;border:1px solid var(--g);color:var(--g)}
+.pill-gold{border:1.5px solid var(--y);color:var(--y);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:800;background:transparent;white-space:nowrap}
+.pill-red{background:#1a0200;border:1px solid var(--r);color:var(--r)}
+.pill-gray{background:#111;border:1px solid #333;color:#888}
+
+/* ── Live dot ── */
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--g);display:inline-block;animation:liveBlip 1.6s ease-in-out infinite}
+
+/* ── Card cells ── */
+.bingo-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bingo-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cell{border-radius:14px;cursor:pointer;text-align:center;user-select:none;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:background .12s,border-color .12s,transform .08s;-webkit-tap-highlight-color:transparent;border-width:1.5px;border-style:solid;overflow:hidden}
+.cell:active{transform:scale(.96)}
+.bingo-grid-4 .cell{min-height:72px;padding:5px 3px}
+.bingo-grid-3 .cell{min-height:92px;padding:8px 5px}
+.cell-emoji{font-size:22px;line-height:1}
+.bingo-grid-3 .cell-emoji{font-size:28px}
+.cell-label{font-size:9.5px;font-weight:700;line-height:1.2;text-align:center;word-break:break-word;hyphens:auto;padding:0 2px}
+.bingo-grid-3 .cell-label{font-size:11px}
+.cell-slok{font-size:8.5px;font-weight:900;opacity:.8;margin-top:1px}
+.cell.hit::after{content:"✓";position:absolute;top:4px;right:6px;font-size:12px;font-weight:900;opacity:.8}
+.cell.rare:not(.hit){animation:goldPulse 2s ease-in-out infinite}
+.cell.bingo-ln{animation:rowFlash .7s ease-in-out}
+
+/* ── Match header ── */
+.match-bar{background:#111;border-bottom:1px solid #1e1e1e;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.match-score{font-family:'Anton',Impact,sans-serif;font-size:22px;letter-spacing:3px;color:var(--y)}
+.match-name{font-size:13px;font-weight:700;color:#888;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* ── Player bar ── */
+.player-bar{background:#0d0d0d;border-bottom:1px solid #1e1e1e;padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+
+/* ── Toasts ── */
+.toast-side{position:fixed;right:12px;top:14px;z-index:1200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#1a1a1a;border:2px solid var(--y);border-radius:14px;padding:11px 15px;animation:toastIn .35s;max-width:210px;box-shadow:0 4px 24px #0008;pointer-events:auto}
+.toast-center{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;border-radius:14px;padding:11px 22px;font-weight:900;font-size:16px;z-index:1200;animation:toastDrop .3s;box-shadow:0 4px 24px #0008;white-space:nowrap;pointer-events:none}
+
+/* ── Confetti ── */
+#cf{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
+.cf{position:absolute;animation:confFall ease-in forwards}
+
+/* ── ADJE overlay ── */
+.adje-overlay{position:fixed;inset:0;pointer-events:none;z-index:9997;animation:adjeFlash 1.3s ease-out forwards}
+
+/* ── Host alert banner ── */
+.host-alert{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:1100;background:#1a1a1a;border:2px solid var(--y);border-radius:16px;padding:14px 20px;text-align:center;min-width:240px;max-width:320px;box-shadow:0 8px 32px #000a;animation:alertDrop .3s}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;border:1.5px solid transparent;background:transparent;color:#555;cursor:pointer;transition:all .15s}
+.tab.active{background:#1a1a1a;border-color:var(--g);color:var(--g)}
+
+/* ── Player row ── */
+.p-row{display:flex;align-items:center;gap:12px;background:#131313;border:1px solid #1e1e1e;border-radius:14px;padding:12px 16px;margin-bottom:8px}
+.p-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border-width:2.5px;border-style:solid}
+
+/* ── Toggle ── */
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:#222;border-radius:12px;transition:background .2s;cursor:pointer}
+.toggle input:checked+.toggle-track{background:var(--g)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle input:checked~.toggle-thumb{transform:translateX(20px)}
+
+/* ── Color picker ── */
+.color-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.color-opt{width:100%;aspect-ratio:1;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .1s,border-color .1s}
+.color-opt.selected{border-color:#fff;transform:scale(1.12)}
+
+/* ── Avatar grid ── */
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.av-opt{aspect-ratio:1;border-radius:10px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;background:#1c1c1c;transition:border-color .1s,transform .1s}
+.av-opt.selected{border-color:var(--g);transform:scale(1.08)}
+
+/* ── Category checkbox ── */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-opt{border:1.5px solid #2a2a2a;border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .12s,background .12s}
+.cat-opt.selected{border-color:var(--g);background:#111}
+
+/* ── Spinner ── */
+.spin{width:32px;height:32px;border:3px solid #222;border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite}
+
+/* ── Code display ── */
+.code-big{font-family:'Anton',Impact,sans-serif;font-size:48px;letter-spacing:8px;color:var(--r);text-align:center}
+
+/* ── Stat row ── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e1e1e}
+
+/* ── Winner podium ── */
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:6px}
+.podium-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+
+/* ── Admin vakje row ── */
+.vak-row{display:flex;align-items:center;gap:8px;background:#131313;border:1px solid #1e1e1e;border-radius:10px;padding:9px 10px;margin-bottom:6px}
+.vak-row:has(input:focus){border-color:#444}
+
+/* ── Misc ── */
+.neon-lbl{font-size:10px;color:#555;letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.section{margin-bottom:24px}
+.divider{border:none;border-top:1px solid #1e1e1e;margin:16px 0}
+.scroll-x{overflow-x:auto;scrollbar-width:none}
+.scroll-x::-webkit-scrollbar{display:none}
+.center{display:flex;align-items:center;justify-content:center}
+.col{display:flex;flex-direction:column}
+.row{display:flex;align-items:center}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
+.flex1{flex:1}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.bold{font-weight:800}
+.small{font-size:12px}
+.dim{color:#555}
+.truncate{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.w100{width:100%}
+.screen{min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;background:#0a0a0a}
+.safe-bottom{padding-bottom:env(safe-area-inset-bottom,16px)}
+
+/* ── Login / auth ── */
+.login-hero{text-align:center;padding:40px 0 28px}
+.auth-card{background:#131313;border:1px solid #1e1e1e;border-radius:16px;padding:20px 16px;margin-bottom:16px}
+
+/* ── Bottom Navigation ── */
+.bottom-nav{display:flex;background:#111;border-top:1px solid #1e1e1e;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;border:none;background:none;cursor:pointer;transition:color .15s;color:#444;gap:2px;-webkit-tap-highlight-color:transparent;position:relative}
+.nav-btn.active{color:var(--g)}
+.nav-btn-icon{font-size:19px;line-height:1}
+.nav-btn-lbl{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.nav-badge{position:absolute;top:6px;right:calc(50% - 14px);background:var(--r);color:#fff;border-radius:10px;font-size:9px;font-weight:900;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* ── Session code in header ── */
+.sess-code{display:inline-flex;align-items:center;gap:5px;background:#111;border:1px solid #2a2a2a;border-radius:20px;padding:3px 10px 3px 8px}
+.sess-code-val{font-family:'Anton',Impact,sans-serif;letter-spacing:2px;font-size:14px;color:var(--r)}
+.sess-code-lbl{font-size:10px;color:#555;font-weight:700}
+
+/* ── Full-screen drink alert ── */
+.drink-alert{position:fixed;inset:0;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px;animation:drinkIn .28s ease-out}
+@keyframes drinkIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+@keyframes drinkOut{from{opacity:1}to{opacity:0;transform:scale(1.08)}}
+.drink-alert-out{animation:drinkOut .22s ease-in forwards}
+
+/* ── Expandable bingo cell ── */
+.cell-detail{position:fixed;inset:0;z-index:800;background:#000b;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .16s}
+.cell-detail-card{background:#131313;border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-width:460px;animation:slideUp .22s;border-top:1px solid #2a2a2a}
+
+/* ── Visual leaderboard ── */
+.lb-row{display:flex;align-items:center;gap:10px;background:#131313;border:1px solid #1e1e1e;border-radius:12px;padding:10px 14px;transition:border-color .3s}
+.lb-row.me{border-color:var(--g)}
+.beer-track{background:#1e1e1e;border-radius:4px;flex:1;height:7px;overflow:hidden}
+.beer-fill{height:100%;border-radius:4px;transition:width .6s ease-out;background:linear-gradient(90deg,var(--y),var(--r))}
+.lb-rank{font-family:'Anton',Impact,sans-serif;font-size:18px;color:#333;width:24px;text-align:center}
+
+/* ── Predictions ── */
+.pred-q{background:#131313;border:1.5px solid #1e1e1e;border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:border-color .15s}
+.pred-q.answered{border-color:var(--g)}
+.pred-q.correct{background:#0f1800;border-color:var(--y)}
+.pred-q.wrong{opacity:.6}
+
+/* ── Card approval ── */
+.approval-card{background:#131313;border:1px solid #1e1e1e;border-radius:14px;padding:14px;margin-bottom:12px}
+.approval-card.approved{border-color:var(--g)}
+.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:10px 0}
+.mini-cell{border-radius:6px;padding:4px 2px;text-align:center;font-size:8px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:border-color .1s;min-height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1}
+.mini-cell:hover{border-color:#555}
+.mini-cell.selected-swap{border-color:var(--y)!important;box-shadow:0 0 0 2px var(--y)33}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="cf"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const SB_URL = "https://ycnhujswvtyoldnqesig.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inljbmh1anN3dnR5b2xkbnFlc2lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4OTk5OTUsImV4cCI6MjA5MzQ3NTk5NX0.RJc4WGRVtAvFh7YFUAIJWiqzJJB5RaWm700TgyHTjN4";
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const ADMIN_EMAIL = "joeydefijter@gmail.com";
+const ADJE_VAL = 5;
+
+const CATEGORIES = {
+  veld:        {lbl:"⚽ Veld",       desc:"Acties op het veld"},
+  snel:        {lbl:"⚡ Snel",        desc:"Frequente acties"},
+  var:         {lbl:"📺 VAR & Scheids",desc:"Arbitrage"},
+  trainer:     {lbl:"😡 Trainer",    desc:"Dug-out & wissels"},
+  supporters:  {lbl:"👥 Supporters", desc:"Publiek"},
+  commentator: {lbl:"🎤 Commentator",desc:"TV & uitzending"},
+  overig:      {lbl:"🎭 Overig",     desc:"Overige"},
+};
+
+const SLOK_TYPES = {
+  slok:          {lbl:"Slokken",     color:"#38bdf8"},
+  adje:          {lbl:"ADJE 🍺",     color:"#f97316"},
+  adje_iedereen: {lbl:"IEDEREEN 🍺", color:"#e8180d"},
+  dubbel_adje:   {lbl:"DUBBEL 💀",   color:"#a855f7"},
+  uitdelen:      {lbl:"UITDELEN 👉", color:"#22c55e"},
+};
+
+const COLORS = {
+  rood:   {a:"#e8380d",bg:"#0c0000",card:"#1a0404",bd:"#3a1010",tx:"#fff",  cell:"#1a0404",lbl:"🔴 Rood"},
+  groen:  {a:"#22c55e",bg:"#001508",card:"#011e0e",bd:"#0a3818",tx:"#e2fced",cell:"#011e0e",lbl:"🟢 Groen"},
+  blauw:  {a:"#38bdf8",bg:"#000b10",card:"#031220",bd:"#082040",tx:"#e0f4fe",cell:"#031220",lbl:"🔵 Blauw"},
+  oranje: {a:"#f97316",bg:"#0e0400",card:"#200e00",bd:"#3c1700",tx:"#fff1e6",cell:"#200e00",lbl:"🟠 Oranje"},
+  paars:  {a:"#a78bfa",bg:"#080015",card:"#110025",bd:"#28104c",tx:"#ede9fe",cell:"#110025",lbl:"🟣 Paars"},
+  geel:   {a:"#facc15",bg:"#0e0d00",card:"#1c1b00",bd:"#383700",tx:"#fefce8",cell:"#1c1b00",lbl:"🟡 Geel"},
+  roze:   {a:"#f472b6",bg:"#100012",card:"#1e0022",bd:"#3a0040",tx:"#fce7f3",cell:"#1e0022",lbl:"🌸 Roze"},
+  cyaan:  {a:"#06b6d4",bg:"#000c10",card:"#011820",bd:"#053040",tx:"#e0fffe",cell:"#011820",lbl:"🩵 Cyaan"},
+  limoen: {a:"#84cc16",bg:"#060e00",card:"#0e1a00",bd:"#1c3400",tx:"#f7fee7",cell:"#0e1a00",lbl:"🟩 Limoen"},
+  wit:    {a:"#e2e8f0",bg:"#0a0a0a",card:"#161616",bd:"#2a2a2a",tx:"#ffffff",cell:"#161616",lbl:"⬜ Wit"},
+};
+
+const AVATARS = ["⚽","🏆","👑","🔥","💪","🧤","⚡","🍺","💥","😎","🤯","🦁","🦊","🌟","💎","🚀","🥇","🎯","🐉","🌈"];
+
+// type: "team"=kies team_a/team_b/gelijkspel, "yesno"=Ja/Nee, "choice"=vaste opties, "text"=vrije invoer
+const PREDICTION_QUESTIONS = [
+  {id:"pq1", q:"Wie scoort de eerste goal?",             emoji:"⚽", type:"text",   hint:"Spelersnaam of 'Geen goal'"},
+  {id:"pq2", q:"Welk team scoort het eerst?",             emoji:"🏳️", type:"team",   hint:"Kies een team"},
+  {id:"pq3", q:"Exacte eindstand?",                       emoji:"🔢", type:"score",  hint:"Bijv. 2-1"},
+  {id:"pq4", q:"Hoeveel goals vallen er totaal?",         emoji:"🎯", type:"choice", choices:["0","1","2","3","4","5+"]},
+  {id:"pq5", q:"Komt er een rode kaart?",                 emoji:"🟥", type:"yesno"},
+  {id:"pq6", q:"Wordt er een penalty gegeven?",           emoji:"🟢", type:"yesno"},
+  {id:"pq7", q:"Wie wordt Man of the Match?",             emoji:"🌟", type:"text",   hint:"Spelersnaam"},
+  {id:"pq8", q:"In welk kwartier valt de 1e goal?",       emoji:"⏱️", type:"choice", choices:["1–15","16–30","31–45","46–60","61–75","76–90+","Geen goal"]},
+  {id:"pq9", q:"Hoeveel gele kaarten in totaal?",         emoji:"🟨", type:"choice", choices:["0","1","2","3","4","5+"]},
+  {id:"pq10",q:"Eindigt de eerste helft 0-0?",            emoji:"🤷", type:"yesno"},
+  {id:"pq11",q:"Scoort een invaller een goal?",           emoji:"🔄", type:"yesno"},
+  {id:"pq12",q:"Komt er een own goal?",                   emoji:"😱", type:"yesno"},
+  {id:"pq13",q:"Schot op de paal of lat?",                emoji:"🪵", type:"yesno"},
+  {id:"pq14",q:"Welk team heeft meer balbezit?",          emoji:"📊", type:"team",   hint:"Kies een team"},
+  {id:"pq15",q:"Welke speler wordt het vroegst gewisseld?",emoji:"↔️", type:"text",  hint:"Spelersnaam"},
+  {id:"pq16",q:"Komt er een verlenging?",                 emoji:"⏰", type:"yesno"},
+  {id:"pq17",q:"Wordt de VAR ingezet?",                   emoji:"📺", type:"yesno"},
+  {id:"pq18",q:"Hoeveel blessureminuten in de 2e helft?", emoji:"⏱️", type:"choice", choices:["1–3","4–6","7–9","10+"]},
+  {id:"pq19",q:"Scoort het team dat als eerste achterkomt?",emoji:"💪", type:"yesno"},
+  {id:"pq20",q:"Wint het team dat de aftrap neemt?",      emoji:"🪙", type:"team",   hint:"Kies een team"},
+  {id:"pq25",q:"Wie scoort het laatste goal?",            emoji:"🏁", type:"text",   hint:"Spelersnaam of 'Geen goal'"},
+  {id:"pq26",q:"Hoeveel hoekschoppen totaal?",            emoji:"🚩", type:"choice", choices:["0–3","4–6","7–9","10–12","13+"]},
+  {id:"pq41",q:"Wordt er een penalty gemist?",            emoji:"🙈", type:"yesno"},
+  {id:"pq45",q:"Wint het team met de meeste supporters?", emoji:"👥", type:"team",   hint:"Kies een team"},
+];
+
+const LINES4 = [
+  [0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],
+  [0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],
+  [0,5,10,15],[3,6,9,12]
+];
+const LINES3 = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+const uid = () => Math.random().toString(36).slice(2,9);
+
+function seededShuffle(arr, seed) {
+  const a = [...arr]; let sv = seed;
+  const r = () => { sv=(sv*1664525+1013904223)&0xffffffff; return(sv>>>0)/0xffffffff; };
+  for (let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function makeCard(pool, color, sessionId, gridSize=4) {
+  const size = gridSize * gridSize;
+  const seed = [...(color+(sessionId||"x"))].reduce((a,c,i)=>a+c.charCodeAt(0)*(i+1),42);
+  const rare   = pool.filter(e=>e.is_rare);
+  const common = pool.filter(e=>!e.is_rare);
+  const nRare  = Math.min(Math.floor(size/4), rare.length);
+  const nCommon = size - nRare;
+  const cPool  = common.length >= nCommon ? common : pool;
+  const sc = seededShuffle(cPool, seed).slice(0, Math.min(nCommon, cPool.length));
+  const sr = seededShuffle(rare,  seed*7).slice(0, nRare);
+  let card = seededShuffle([...sc,...sr], seed*13);
+  // pad if needed
+  if (card.length < size) {
+    const used = new Set(card.map(e=>e.id));
+    for (const e of pool) { if (!used.has(e.id)){card.push(e);} if(card.length>=size)break; }
+  }
+  return card.slice(0, size);
+}
+
+function getLines(gs) { return gs===4 ? LINES4 : LINES3; }
+
+function checkBingo(counts, gs) {
+  const lines = getLines(gs);
+  return lines.filter(line => line.every(i => (counts[i]||0) > 0));
+}
+
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
+
+function confetti(n=60, accent=null) {
+  const root=document.getElementById("cf"); if(!root)return;
+  const base=["#22c55e","#facc15","#e8380d","#fff","#38bdf8","#f97316"];
+  const cols=accent?[accent,accent,"#fff",...base]:base;
+  for(let i=0;i<n;i++){
+    const el=document.createElement("div");el.className="cf";
+    Object.assign(el.style,{left:Math.random()*100+"vw",top:"-12px",
+      background:cols[~~(Math.random()*cols.length)],
+      animationDelay:Math.random()*.6+"s",animationDuration:1.5+Math.random()*1.5+"s",
+      width:6+Math.random()*7+"px",height:6+Math.random()*7+"px",
+      borderRadius:Math.random()>.5?"50%":"2px"});
+    root.appendChild(el); setTimeout(()=>el.remove(),3500);
+  }
+}
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+let _ac=null;
+const getAC=()=>{if(!_ac)try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch{}if(_ac?.state==="suspended")_ac.resume().catch(()=>{});return _ac;};
+function tone(f,d,v=0.15,t="sine"){
+  const c=getAC();if(!c)return;
+  try{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);
+    o.frequency.value=f;o.type=t;const n=c.currentTime;
+    g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(0.001,n+d);
+    o.start(n);o.stop(n+d);}catch{}
+}
+const sClick  = ()=>tone(880,.08,.1);
+const sBingo  = ()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.32,.2),i*120));
+const sGoal   = ()=>[400,600,800,1000,1200,1000].forEach((f,i)=>setTimeout(()=>tone(f,.2,.25,"triangle"),i*80));
+const sAdje   = ()=>[300,350,500,400].forEach((f,i)=>setTimeout(()=>tone(f,.22,.2),i*90));
+const sFanfare= ()=>[392,523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.4,.2,"triangle"),i*100));
+
+// ── Wake Lock ─────────────────────────────────────────────────────────────────
+let _wl=null;
+async function reqWL(){if("wakeLock" in navigator){try{_wl=await navigator.wakeLock.request("screen");}catch{}}}
+function relWL(){_wl?.release().catch(()=>{});_wl=null;}
+
+// ── Vibrate ───────────────────────────────────────────────────────────────────
+const buzz=(p=[200])=>{if("vibrate" in navigator)navigator.vibrate(p);};
+
+// ── slokLabel ─────────────────────────────────────────────────────────────────
+function slokLabel(ev) {
+  if (ev.slok_type==="adje")          return "ADJE";
+  if (ev.slok_type==="adje_iedereen") return "IEDEREEN";
+  if (ev.slok_type==="dubbel_adje")   return "DUBBEL";
+  if (ev.slok_type==="uitdelen")      return "UITDELEN";
+  return `${ev.slok}×`;
+}
+function slokColor(ev) {
+  return SLOK_TYPES[ev.slok_type]?.color || "#38bdf8";
+}
+function slokValue(ev) {
+  if (ev.slok_type==="adje")          return ADJE_VAL;
+  if (ev.slok_type==="adje_iedereen") return ADJE_VAL;
+  if (ev.slok_type==="dubbel_adje")   return ADJE_VAL*2;
+  if (ev.slok_type==="uitdelen")      return 0;
+  return ev.slok||1;
+}
+
+// ── Shared components ─────────────────────────────────────────────────────────
+function Spinner(){return <div className="center" style={{padding:40}}><div className="spin"/></div>;}
+function Toggle({checked,onChange}){
+  return <label className="toggle" style={{display:"inline-block"}} onClick={e=>e.stopPropagation()}>
+    <input type="checkbox" checked={checked} onChange={onChange}/>
+    <div className="toggle-track"/>
+    <div className="toggle-thumb"/>
+  </label>;
+}
+function Sheet({open,onClose,children,center}){
+  if(!open)return null;
+  return <div className="overlay" onClick={onClose}>
+    <div className={center?"sheet-center":"sheet"} onClick={e=>e.stopPropagation()}>{children}</div>
+  </div>;
+}
+function PlayerAvatar({p,size=42}){
+  const C=COLORS[p.color]||COLORS.groen;
+  return <div className="p-av" style={{width:size,height:size,borderColor:C.a,background:C.cell,fontSize:size*.5}}>
+    {p.avatar||"⚽"}
+  </div>;
+}
+
+// ── Toast system ──────────────────────────────────────────────────────────────
+function useToasts(){
+  const [toasts,setToasts]=useState([]);
+  const add=useCallback((msg,opts={})=>{
+    const id=uid();
+    setToasts(t=>[...t,{id,msg,...opts}]);
+    setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),opts.dur||3000);
+  },[]);
+  return{toasts,add};
+}
+function ToastList({toasts}){
+  return <div className="toast-side">
+    {toasts.map(t=>(
+      <div key={t.id} className="toast" style={t.color?{borderLeftColor:t.color}:{}}>
+        <div style={{fontWeight:700,fontSize:13}}>{t.msg}</div>
+        {t.sub&&<div style={{fontSize:11,color:COLORS[t.color]?.a||"#888",marginTop:2}}>{t.sub}</div>}
+      </div>
+    ))}
+  </div>;
+}
+
+// ── LoginScreen ───────────────────────────────────────────────────────────────
+function LoginScreen({onLogin,pwRecovery,onPwRecoveryDone}){
+  const [tab,setTab]=useState(pwRecovery?"newpw":"login");
+  const [email,setEmail]=useState("");
+  const [pass,setPass]=useState("");
+  const [pass2,setPass2]=useState("");
+  const [err,setErr]=useState("");
+  const [info,setInfo]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{if(pwRecovery)setTab("newpw");},[pwRecovery]);
+
+  function switchTab(t){setTab(t);setErr("");setInfo("");setPass("");setPass2("");}
+
+  async function doLogin(){
+    if(!email||!pass){setErr("Vul je e-mailadres en wachtwoord in");return;}
+    setLoading(true);setErr("");
+    const{data,error}=await sb.auth.signInWithPassword({email:email.trim(),password:pass});
+    if(error){setErr("Inloggen mislukt: "+error.message);setLoading(false);return;}
+    onLogin(data.user);
+  }
+
+  async function doRegister(){
+    if(!email){setErr("Vul je e-mailadres in");return;}
+    if(!pass||pass.length<6){setErr("Wachtwoord moet minimaal 6 tekens zijn");return;}
+    if(pass!==pass2){setErr("Wachtwoorden komen niet overeen");return;}
+    setLoading(true);setErr("");
+    const{data,error}=await sb.auth.signUp({email:email.trim(),password:pass});
+    if(error){setErr("Account aanmaken mislukt: "+error.message);setLoading(false);return;}
+    if(data.user?.email_confirmed_at){
+      onLogin(data.user);
+    } else {
+      setInfo("📧 Bevestigingsmail verstuurd naar "+email+". Klik de link, daarna kun je inloggen.");
+      setTab("login");setPass("");setPass2("");
+    }
+    setLoading(false);
+  }
+
+  async function doForgot(){
+    if(!email){setErr("Vul je e-mailadres in");return;}
+    setLoading(true);setErr("");
+    const{error}=await sb.auth.resetPasswordForEmail(email.trim(),{
+      redirectTo:window.location.origin+window.location.pathname
+    });
+    if(error){setErr(error.message);setLoading(false);return;}
+    setInfo("📧 Reset-link verstuurd naar "+email+". Klik de link in de mail.");
+    setLoading(false);
+  }
+
+  async function doSetNewPw(){
+    if(!pass||pass.length<6){setErr("Wachtwoord moet minimaal 6 tekens zijn");return;}
+    if(pass!==pass2){setErr("Wachtwoorden komen niet overeen");return;}
+    setLoading(true);setErr("");
+    const{error}=await sb.auth.updateUser({password:pass});
+    if(error){setErr("Kon wachtwoord niet opslaan: "+error.message);setLoading(false);return;}
+    await sb.auth.signOut();
+    onPwRecoveryDone?.();
+    setInfo("✅ Wachtwoord opgeslagen! Log nu in.");
+    setTab("login");setPass("");setPass2("");
+    setLoading(false);
+  }
+
+  return <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",background:"#0a0a0a",maxWidth:480,margin:"0 auto"}}>
+    <div className="login-hero">
+      <div style={{fontSize:64,marginBottom:4}}>⚽</div>
+      <div className="anto" style={{fontSize:38,color:"var(--g)",lineHeight:1}}>WK BINGO</div>
+      <div className="anto" style={{fontSize:22,color:"var(--y)"}}>2026</div>
+      <div style={{color:"#555",fontSize:13,marginTop:6}}>Het ultieme WK voetbal drankspel</div>
+    </div>
+
+    <div style={{padding:"0 20px 40px",flex:1}}>
+      {tab!=="newpw"&&<div className="tabs" style={{marginBottom:20}}>
+        <button className={`tab${tab==="login"?" active":""}`} onClick={()=>switchTab("login")}>Inloggen</button>
+        <button className={`tab${tab==="register"?" active":""}`} onClick={()=>switchTab("register")}>Account aanmaken</button>
+        <button className={`tab${tab==="forgot"?" active":""}`} onClick={()=>switchTab("forgot")}>Wachtwoord vergeten</button>
+      </div>}
+
+      {tab==="login"&&<div className="auth-card">
+        <div className="neon-lbl mb8">E-MAILADRES</div>
+        <input className="inp" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+          placeholder="jouw@email.com" style={{marginBottom:12}}/>
+        <div className="neon-lbl mb8">WACHTWOORD</div>
+        <input className="inp" type="password" value={pass} onChange={e=>setPass(e.target.value)}
+          placeholder="••••••••" style={{marginBottom:20}} onKeyDown={e=>e.key==="Enter"&&doLogin()}/>
+        {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+        {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+        <button className="btn btn-green btn-block" onClick={doLogin} disabled={loading||!email||!pass}>
+          {loading?"Bezig…":"Inloggen →"}
+        </button>
+      </div>}
+
+      {tab==="register"&&<div className="auth-card">
+        <div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:10,padding:11,fontSize:12,color:"#555",marginBottom:16}}>
+          Maak een account aan om je bingo-voortgang op te slaan en statistieken bij te houden.
+        </div>
+        <div className="neon-lbl mb8">E-MAILADRES</div>
+        <input className="inp" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+          placeholder="jouw@email.com" style={{marginBottom:12}}/>
+        <div className="neon-lbl mb8">WACHTWOORD (min. 6 tekens)</div>
+        <input className="inp" type="password" value={pass} onChange={e=>setPass(e.target.value)}
+          placeholder="Kies een wachtwoord" style={{marginBottom:12}}/>
+        <div className="neon-lbl mb8">BEVESTIG WACHTWOORD</div>
+        <input className="inp" type="password" value={pass2} onChange={e=>setPass2(e.target.value)}
+          placeholder="Herhaal wachtwoord" style={{marginBottom:20}} onKeyDown={e=>e.key==="Enter"&&doRegister()}/>
+        {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+        {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+        <button className="btn btn-gold btn-block" onClick={doRegister} disabled={loading||!email||!pass||!pass2}>
+          {loading?"Bezig…":"Account Aanmaken →"}
+        </button>
+      </div>}
+
+      {tab==="forgot"&&<div className="auth-card">
+        <div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:10,padding:11,fontSize:12,color:"#555",marginBottom:16}}>
+          Vul je e-mailadres in. Je krijgt een link om je wachtwoord te resetten.
+        </div>
+        <div className="neon-lbl mb8">E-MAILADRES</div>
+        <input className="inp" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+          placeholder="jouw@email.com" style={{marginBottom:20}}/>
+        {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+        {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+        <button className="btn btn-ghost btn-block" onClick={doForgot} disabled={loading||!email}>
+          {loading?"Mail versturen…":"📧 Reset-mail Versturen →"}
+        </button>
+      </div>}
+
+      {tab==="newpw"&&<div className="auth-card">
+        <div className="anto" style={{fontSize:20,color:"var(--y)",marginBottom:16}}>🔑 Nieuw Wachtwoord</div>
+        <div className="neon-lbl mb8">NIEUW WACHTWOORD</div>
+        <input className="inp" type="password" value={pass} onChange={e=>setPass(e.target.value)}
+          placeholder="Min. 6 tekens" style={{marginBottom:12}}/>
+        <div className="neon-lbl mb8">BEVESTIG WACHTWOORD</div>
+        <input className="inp" type="password" value={pass2} onChange={e=>setPass2(e.target.value)}
+          placeholder="Herhaal wachtwoord" style={{marginBottom:20}} onKeyDown={e=>e.key==="Enter"&&doSetNewPw()}/>
+        {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+        {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+        <button className="btn btn-green btn-block" onClick={doSetNewPw} disabled={loading||!pass||!pass2}>
+          {loading?"Opslaan…":"Wachtwoord Opslaan →"}
+        </button>
+      </div>}
+    </div>
+  </div>;
+}
+
+// ── HomeScreen ────────────────────────────────────────────────────────────────
+// ── ConfirmDialog ─────────────────────────────────────────────────────────────
+function ConfirmDialog({open,title,body,confirmLabel="Ja, doorgaan",danger=true,onConfirm,onCancel}){
+  if(!open)return null;
+  return <div style={{position:"fixed",inset:0,zIndex:9500,background:"#000c",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+    onClick={onCancel}>
+    <div style={{background:"#131313",borderRadius:"20px 20px 0 0",borderTop:"1px solid #2a2a2a",
+      padding:"24px 20px 40px",width:"100%",maxWidth:480,animation:"slideUp .22s ease-out"}}
+      onClick={e=>e.stopPropagation()}>
+      <div style={{fontWeight:800,fontSize:18,marginBottom:6,color:"#fff"}}>{title}</div>
+      {body&&<div style={{color:"#666",fontSize:14,marginBottom:24,lineHeight:1.5}}>{body}</div>}
+      <button className="btn btn-block" style={{background:danger?"var(--r)":"var(--g)",color:"#fff",padding:"14px",marginBottom:10,fontSize:15,fontWeight:800}}
+        onClick={onConfirm}>{confirmLabel}</button>
+      <button className="btn btn-ghost btn-block" onClick={onCancel}>Annuleren</button>
+    </div>
+  </div>;
+}
+
+// ── HomeScreen ────────────────────────────────────────────────────────────────
+function HomeScreen({authUser,onCreate,onJoin,onAdmin,joinCode,onLogout}){
+  const [tab,setTab]=useState("spelen");
+  const [code,setCode]=useState(joinCode||"");
+  const [history,setHistory]=useState([]);
+  const [histLoading,setHistLoading]=useState(false);
+  const [newPwMode,setNewPwMode]=useState(false);
+  const [curPw,setCurPw]=useState("");
+  const [newPw,setNewPw]=useState("");
+  const [pwErr,setPwErr]=useState("");
+  const [pwOk,setPwOk]=useState("");
+  const [pwLoading,setPwLoading]=useState(false);
+  const displayName=authUser?.user_metadata?.display_name||authUser?.email?.split("@")[0]||"Speler";
+  const isAdmin=authUser?.email===ADMIN_EMAIL;
+
+  useEffect(()=>{if(tab==="stats")loadHistory();},[tab]);
+
+  async function loadHistory(){
+    setHistLoading(true);
+    const{data}=await sb.from("wk_players")
+      .select("total_slok,bingo_lines,counts,is_host,created_at,wk_sessions!inner(match_name,match_score,status,created_at)")
+      .eq("user_id",authUser.id)
+      .order("created_at",{ascending:false})
+      .limit(30);
+    setHistory(data||[]);
+    setHistLoading(false);
+  }
+
+  async function changePassword(){
+    if(!newPw||newPw.length<6){setPwErr("Wachtwoord min. 6 tekens");return;}
+    setPwLoading(true);setPwErr("");
+    const{error}=await sb.auth.updateUser({password:newPw});
+    if(error){setPwErr(error.message);setPwLoading(false);return;}
+    setPwOk("✅ Wachtwoord opgeslagen!");setNewPwMode(false);setNewPw("");setCurPw("");
+    setPwLoading(false);setTimeout(()=>setPwOk(""),3000);
+  }
+
+  const totalSlok=history.reduce((s,h)=>s+(h.total_slok||0),0);
+  const totalBingos=history.reduce((s,h)=>s+(h.bingo_lines?.length||0),0);
+  const gamesPlayed=history.length;
+  const gamesHost=history.filter(h=>h.is_host).length;
+  const bestGame=history.reduce((b,h)=>(!b||(h.total_slok||0)>(b.total_slok||0))?h:b,null);
+
+  return <div style={{display:"flex",flexDirection:"column",height:"100vh",background:"#0a0a0a",maxWidth:480,margin:"0 auto"}}>
+
+    {/* ── SPELEN TAB ── */}
+    {tab==="spelen"&&<div style={{flex:1,overflow:"auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 24px 16px"}}>
+      <div style={{fontSize:64,marginBottom:4}}>⚽</div>
+      <div className="anto" style={{fontSize:36,color:"var(--g)",textAlign:"center",lineHeight:1}}>WK BINGO</div>
+      <div className="anto" style={{fontSize:20,color:"var(--y)",marginBottom:4}}>2026</div>
+      <div style={{color:"#555",fontSize:13,textAlign:"center",marginBottom:32}}>Het ultieme WK voetbal drankspel</div>
+
+      <button className="btn btn-green btn-block" style={{marginBottom:12,fontSize:17,padding:"16px 20px"}} onClick={onCreate}>
+        ⚽ Sessie Aanmaken
+      </button>
+
+      <div style={{width:"100%",marginBottom:16}}>
+        <div style={{fontSize:11,color:"#555",textAlign:"center",marginBottom:8,letterSpacing:1}}>OF JOIN EEN SESSIE</div>
+        <input className="inp" placeholder="Sessiecode…" value={code}
+          onChange={e=>setCode(e.target.value.toUpperCase().trim())}
+          style={{marginBottom:8,textAlign:"center",letterSpacing:4,fontSize:22,fontFamily:"Anton,Impact,sans-serif"}}/>
+        <button className="btn btn-ghost btn-block" onClick={()=>onJoin(code)} disabled={!code}>
+          🎟️ Doe Mee
+        </button>
+      </div>
+
+      {isAdmin&&<button className="btn btn-ghost btn-block btn-sm" style={{color:"var(--p)",borderColor:"var(--p)33",marginTop:4}} onClick={onAdmin}>
+        ⚙️ Beheerder Paneel
+      </button>}
+    </div>}
+
+    {/* ── STATISTIEKEN TAB ── */}
+    {tab==="stats"&&<div style={{flex:1,overflow:"auto",padding:"16px 16px 24px"}}>
+      <div className="anto" style={{fontSize:22,color:"var(--y)",marginBottom:16}}>📊 Statistieken</div>
+
+      {/* Stat cards */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+        {[
+          {label:"Potjes gespeeld",value:gamesPlayed,icon:"🎮",color:"var(--b)"},
+          {label:"Totaal slokken",value:totalSlok,icon:"🍺",color:"var(--y)"},
+          {label:"Bingo's gehaald",value:totalBingos,icon:"🏆",color:"var(--g)"},
+          {label:"Keer host",value:gamesHost,icon:"👑",color:"var(--p)"},
+        ].map(s=><div key={s.label} style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:12,padding:"14px 12px"}}>
+          <div style={{fontSize:24,marginBottom:4}}>{s.icon}</div>
+          <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:26,color:s.color}}>{s.value}</div>
+          <div style={{fontSize:11,color:"#555"}}>{s.label}</div>
+        </div>)}
+      </div>
+
+      {bestGame&&<div style={{background:"#131313",border:"1px solid var(--y)33",borderRadius:12,padding:"12px 14px",marginBottom:16}}>
+        <div style={{fontSize:11,color:"var(--y)",fontWeight:700,marginBottom:4}}>🌟 BESTE POTJE</div>
+        <div style={{fontWeight:700}}>{bestGame.wk_sessions?.match_name||"WK Sessie"}</div>
+        <div style={{fontSize:12,color:"#555",marginTop:2}}>🍺 {bestGame.total_slok||0} slokken · {bestGame.bingo_lines?.length||0} bingo's</div>
+      </div>}
+
+      <div className="neon-lbl mb8">GESCHIEDENIS</div>
+      {histLoading?<Spinner/>:history.length===0
+        ?<div style={{textAlign:"center",padding:32,color:"#555"}}>Nog geen potjes gespeeld</div>
+        :history.map((h,i)=>{
+          const sess=h.wk_sessions||{};
+          const date=new Date(h.created_at).toLocaleDateString("nl",{day:"numeric",month:"short"});
+          const bingos=h.bingo_lines?.length||0;
+          return <div key={i} style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center",gap:12}}>
+            <div style={{fontSize:28}}>{h.is_host?"👑":"⚽"}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontWeight:700,fontSize:13,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{sess.match_name||"WK Sessie"}</div>
+              <div style={{fontSize:11,color:"#555"}}>{date}{h.is_host?" · Host":""}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:16,color:"var(--y)"}}>🍺{h.total_slok||0}</div>
+              {bingos>0&&<div style={{fontSize:10,color:"var(--g)"}}>🏆×{bingos}</div>}
+            </div>
+          </div>;
+        })}
+    </div>}
+
+    {/* ── ACCOUNT TAB ── */}
+    {tab==="account"&&<div style={{flex:1,overflow:"auto",padding:"16px 16px 24px"}}>
+      <div className="anto" style={{fontSize:22,color:"var(--b)",marginBottom:20}}>👤 Account</div>
+
+      <div style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:14,padding:"16px",marginBottom:16}}>
+        <div style={{fontSize:11,color:"#555",marginBottom:4,letterSpacing:1}}>INGELOGD ALS</div>
+        <div style={{fontWeight:800,fontSize:16,color:"#fff",marginBottom:2}}>{displayName}</div>
+        <div style={{fontSize:13,color:"#555"}}>{authUser?.email}</div>
+        {isAdmin&&<div style={{display:"inline-block",background:"var(--p)22",border:"1px solid var(--p)55",borderRadius:8,padding:"3px 10px",fontSize:11,color:"var(--p)",fontWeight:700,marginTop:8}}>⚙️ Beheerder</div>}
+      </div>
+
+      {/* Change password */}
+      <div style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:14,padding:"16px",marginBottom:16}}>
+        <div style={{fontWeight:700,marginBottom:12}}>🔑 Wachtwoord wijzigen</div>
+        {!newPwMode?<>
+          {pwOk&&<div style={{color:"var(--g)",fontSize:13,marginBottom:8}}>{pwOk}</div>}
+          <button className="btn btn-ghost btn-block btn-sm" onClick={()=>setNewPwMode(true)}>Wachtwoord wijzigen →</button>
+        </>:<>
+          <input className="inp" type="password" value={newPw} onChange={e=>setNewPw(e.target.value)}
+            placeholder="Nieuw wachtwoord (min. 6 tekens)" style={{marginBottom:12}}/>
+          {pwErr&&<div style={{color:"var(--r)",fontSize:12,marginBottom:8}}>{pwErr}</div>}
+          <div className="row gap8">
+            <button className="btn btn-ghost btn-sm" onClick={()=>{setNewPwMode(false);setNewPw("");setPwErr("");}}>Annuleren</button>
+            <button className="btn btn-green" style={{flex:1}} onClick={changePassword} disabled={pwLoading||!newPw}>
+              {pwLoading?"Bezig…":"Opslaan →"}
+            </button>
+          </div>
+        </>}
+      </div>
+
+      {isAdmin&&<button className="btn btn-ghost btn-block" style={{marginBottom:10,color:"var(--p)",borderColor:"var(--p)33"}} onClick={onAdmin}>
+        ⚙️ Beheerder Paneel
+      </button>}
+
+      <button className="btn btn-ghost btn-block" style={{color:"var(--r)",borderColor:"var(--r)33"}} onClick={onLogout}>
+        Uitloggen
+      </button>
+    </div>}
+
+    {/* Bottom navigation */}
+    <div className="bottom-nav">
+      <button className={`nav-btn${tab==="spelen"?" active":""}`} onClick={()=>setTab("spelen")}>
+        <div className="nav-btn-icon">⚽</div><div className="nav-btn-lbl">Spelen</div>
+      </button>
+      <button className={`nav-btn${tab==="stats"?" active":""}`} onClick={()=>setTab("stats")}>
+        <div className="nav-btn-icon">📊</div><div className="nav-btn-lbl">Statistieken</div>
+      </button>
+      <button className={`nav-btn${tab==="account"?" active":""}`} onClick={()=>setTab("account")}>
+        <div className="nav-btn-icon">👤</div><div className="nav-btn-lbl">Account</div>
+      </button>
+    </div>
+  </div>;
+}
+
+// ── AdminLogin ────────────────────────────────────────────────────────────────
+function AdminLoginScreen({onBack,onSuccess,pwRecovery,onPwRecoveryDone}){
+  const [tab,setTab]=useState(pwRecovery?"newpw":"login");
+  const [email,setEmail]=useState(ADMIN_EMAIL);
+  const [pass,setPass]=useState("");
+  const [pass2,setPass2]=useState("");
+  const [err,setErr]=useState("");
+  const [info,setInfo]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{
+    if(pwRecovery) setTab("newpw");
+  },[pwRecovery]);
+
+  async function login(){
+    setLoading(true);setErr("");setInfo("");
+    const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){setErr(error.message);setLoading(false);return;}
+    if(data.user.email!==ADMIN_EMAIL){
+      await sb.auth.signOut();
+      setErr("Geen toegang: alleen de app-beheerder kan inloggen.");
+      setLoading(false);return;
+    }
+    onSuccess(data.user);
+  }
+
+  async function resetPw(){
+    setLoading(true);setErr("");setInfo("");
+    const{error}=await sb.auth.resetPasswordForEmail(ADMIN_EMAIL,{
+      redirectTo:window.location.origin+window.location.pathname
+    });
+    if(error){setErr(error.message);setLoading(false);return;}
+    setInfo("📧 Wachtwoord-reset mail verstuurd naar "+ADMIN_EMAIL+". Klik de link in de mail.");
+    setLoading(false);
+  }
+
+  async function setNewPw(){
+    if(!pass||pass.length<6){setErr("Wachtwoord moet minimaal 6 tekens zijn");return;}
+    if(pass!==pass2){setErr("Wachtwoorden komen niet overeen");return;}
+    setLoading(true);setErr("");
+    const{data,error}=await sb.auth.updateUser({password:pass});
+    if(error){setErr("Kon wachtwoord niet opslaan: "+error.message+" — probeer opnieuw via 'Wachtwoord vergeten'.");setLoading(false);return;}
+    // Sign out the recovery session so the user logs in fresh with the new password
+    await sb.auth.signOut();
+    onPwRecoveryDone?.();
+    setInfo("✅ Wachtwoord opgeslagen! Log nu in met je nieuwe wachtwoord.");
+    setTab("login");setPass("");setPass2("");
+    setLoading(false);
+  }
+
+  return <div className="screen" style={{padding:"24px 20px"}}>
+    <button className="btn btn-ghost btn-sm" style={{alignSelf:"flex-start",marginBottom:24}} onClick={onBack}>← Terug</button>
+    <div className="anto" style={{fontSize:28,color:"var(--g)",marginBottom:4}}>⚙️ Admin Panel</div>
+    <div style={{color:"#555",fontSize:13,marginBottom:20}}>App-beheerder: {ADMIN_EMAIL}</div>
+
+    {/* Tabs */}
+    {tab!=="newpw"&&<div className="tabs" style={{marginBottom:20}}>
+      <button className={`tab${tab==="login"?" active":""}`} onClick={()=>{setTab("login");setErr("");setInfo("");}}>Inloggen</button>
+      <button className={`tab${tab==="reset"?" active":""}`} onClick={()=>{setTab("reset");setErr("");setInfo("");}}>Wachtwoord vergeten</button>
+    </div>}
+
+    {/* Login */}
+    {tab==="login"&&<>
+      <div className="neon-lbl" style={{marginBottom:6}}>WACHTWOORD</div>
+      <input className="inp" type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••"
+        style={{marginBottom:20}} onKeyDown={e=>e.key==="Enter"&&login()}/>
+      {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+      {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+      <button className="btn btn-green btn-block" onClick={login} disabled={loading||!pass}>
+        {loading?"Bezig…":"Inloggen →"}
+      </button>
+    </>}
+
+    {/* Reset password */}
+    {tab==="reset"&&<>
+      <div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:10,padding:12,fontSize:12,color:"#555",marginBottom:16}}>
+        Er wordt een reset-link gestuurd naar <strong style={{color:"#fff"}}>{ADMIN_EMAIL}</strong>. Klik die link — daarna kun je hier een nieuw wachtwoord instellen.
+      </div>
+      {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+      {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+      <button className="btn btn-ghost btn-block" onClick={resetPw} disabled={loading}>
+        {loading?"Mail versturen…":"📧 Reset-mail Versturen →"}
+      </button>
+    </>}
+
+    {/* New password (after clicking reset link in email) */}
+    {tab==="newpw"&&<>
+      <div className="anto" style={{fontSize:20,color:"var(--y)",marginBottom:12}}>🔑 Nieuw Wachtwoord</div>
+      <div className="neon-lbl" style={{marginBottom:6}}>NIEUW WACHTWOORD</div>
+      <input className="inp" type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Min. 6 tekens"
+        style={{marginBottom:12}}/>
+      <div className="neon-lbl" style={{marginBottom:6}}>BEVESTIG WACHTWOORD</div>
+      <input className="inp" type="password" value={pass2} onChange={e=>setPass2(e.target.value)} placeholder="Herhaal wachtwoord"
+        style={{marginBottom:20}} onKeyDown={e=>e.key==="Enter"&&setNewPw()}/>
+      {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+      {info&&<div style={{color:"var(--g)",fontSize:13,marginBottom:12}}>{info}</div>}
+      <button className="btn btn-green btn-block" onClick={setNewPw} disabled={loading||!pass||!pass2}>
+        {loading?"Opslaan…":"Wachtwoord Opslaan →"}
+      </button>
+    </>}
+  </div>;
+}
+
+// ── AdminPanel ────────────────────────────────────────────────────────────────
+function AdminPanelScreen({user,onBack}){
+  const [tab,setTab]=useState("vakjes");
+  const [events,setEvents]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [catFilter,setCatFilter]=useState("all");
+  const [editEv,setEditEv]=useState(null); // vakje open in sheet
+  const [saving,setSaving]=useState(false);
+  const [sessions,setSessions]=useState([]);
+  const [toast,setToast]=useState("");
+
+  useEffect(()=>{loadEvents();},[]);
+  useEffect(()=>{if(tab==="stats")loadStats();},[tab]);
+
+  async function loadEvents(){
+    setLoading(true);
+    const{data}=await sb.from("wk_events").select("*").order("category").order("sort_order");
+    setEvents(data||[]);setLoading(false);
+  }
+  async function loadStats(){
+    const{data}=await sb.from("wk_sessions").select("*").order("created_at",{ascending:false}).limit(20);
+    setSessions(data||[]);
+  }
+
+  function showToast(msg){setToast(msg);setTimeout(()=>setToast(""),2200);}
+
+  async function saveEdit(){
+    if(!editEv)return;
+    setSaving(true);
+    await sb.from("wk_events").update({
+      label:editEv.label,description:editEv.description,slok:editEv.slok,
+      slok_type:editEv.slok_type,category:editEv.category,emoji:editEv.emoji,
+      vibrate:editEv.vibrate,is_rare:editEv.is_rare,active:editEv.active,
+      updated_at:new Date().toISOString()
+    }).eq("id",editEv.id);
+    setEvents(evs=>evs.map(e=>e.id===editEv.id?{...editEv}:e));
+    setSaving(false);showToast("✅ Opgeslagen");setEditEv(null);
+  }
+
+  async function toggleActive(id,val,e){
+    e.stopPropagation();
+    await sb.from("wk_events").update({active:val}).eq("id",id);
+    setEvents(evs=>evs.map(e=>e.id===id?{...e,active:val}:e));
+  }
+
+  const [confirmDelete,setConfirmDelete]=useState(false);
+  async function deleteEvent(){
+    if(!editEv)return;
+    setConfirmDelete(true);
+  }
+  async function doDeleteEvent(){
+    setConfirmDelete(false);
+    await sb.from("wk_events").delete().eq("id",editEv.id);
+    setEvents(evs=>evs.filter(e=>e.id!==editEv.id));
+    setEditEv(null);showToast("🗑 Verwijderd");
+  }
+
+  async function addEvent(){
+    const cat=catFilter==="all"?"veld":catFilter;
+    const ev={label:"Nieuw vakje",description:"",slok:1,slok_type:"slok",
+      category:cat,emoji:"⚽",vibrate:false,is_rare:false,active:true,sort_order:99};
+    const{data}=await sb.from("wk_events").insert(ev).select().single();
+    if(data){setEvents(evs=>[...evs,data]);setEditEv({...data});}
+  }
+
+  const filtered=(catFilter==="all"?events:events.filter(e=>e.category===catFilter));
+
+  // colour per category
+  const catColor={veld:"var(--g)",snel:"var(--b)",var:"var(--p)",trainer:"var(--y)",supporters:"var(--r)",commentator:"#fb923c",overig:"#888"};
+
+  return <div className="screen" style={{background:"#0a0a0a"}}>
+    {/* Header */}
+    <div style={{padding:"16px 16px 0",flexShrink:0}}>
+      <div className="row gap12" style={{marginBottom:12}}>
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>← Terug</button>
+        <div className="anto" style={{fontSize:22,color:"var(--g)",flex:1}}>⚙️ Admin</div>
+        <div style={{fontSize:12,color:"#555"}}>{user?.email?.split("@")[0]}</div>
+      </div>
+      <div className="tabs" style={{marginBottom:12}}>
+        {["vakjes","stats"].map(t=>(
+          <button key={t} className={`tab${tab===t?" active":""}`} onClick={()=>setTab(t)}>
+            {t==="vakjes"?"🃏 Vakjes":"📊 Statistieken"}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div style={{flex:1,overflow:"auto",padding:"0 16px 80px"}}>
+    {tab==="vakjes"&&<>
+      {/* Category filter + add button */}
+      <div className="row gap8" style={{marginBottom:14,alignItems:"center"}}>
+        <div className="scroll-x" style={{flex:1}}>
+          <div style={{display:"flex",gap:6,paddingBottom:2}}>
+            <button className={`tab${catFilter==="all"?" active":""}`} onClick={()=>setCatFilter("all")}
+              style={{whiteSpace:"nowrap",fontSize:12}}>Alle ({events.length})</button>
+            {Object.entries(CATEGORIES).map(([k,v])=>(
+              <button key={k} className={`tab${catFilter===k?" active":""}`} onClick={()=>setCatFilter(k)}
+                style={{whiteSpace:"nowrap",fontSize:12,borderColor:catFilter===k?catColor[k]:"transparent",color:catFilter===k?catColor[k]:undefined}}>
+                {v.emoji||""} {v.lbl} ({events.filter(e=>e.category===k).length})
+              </button>
+            ))}
+          </div>
+        </div>
+        <button onClick={addEvent}
+          style={{flexShrink:0,width:40,height:40,borderRadius:20,background:"var(--g)",border:"none",
+            color:"#000",fontSize:22,fontWeight:900,cursor:"pointer",display:"flex",alignItems:"center",
+            justifyContent:"center",lineHeight:1}}>+</button>
+      </div>
+
+      {/* Vakjes grid */}
+      {loading?<Spinner/>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
+        {filtered.map(ev=>{
+          const cc=catColor[ev.category]||"#555";
+          return <div key={ev.id} onClick={()=>setEditEv({...ev})}
+            style={{background:"#131313",border:`1.5px solid ${ev.active?"#2a2a2a":"#1a1a1a"}`,borderRadius:14,
+              padding:"12px 10px 10px",cursor:"pointer",position:"relative",
+              opacity:ev.active?1:.45,transition:"border-color .15s,opacity .15s",
+              display:"flex",flexDirection:"column",alignItems:"center",gap:6,minHeight:100}}
+            onMouseOver={e=>e.currentTarget.style.borderColor=cc}
+            onMouseOut={e=>e.currentTarget.style.borderColor=ev.active?"#2a2a2a":"#1a1a1a"}>
+            {/* active toggle pill top-right */}
+            <div onClick={e=>toggleActive(ev.id,!ev.active,e)}
+              style={{position:"absolute",top:7,right:7,width:28,height:16,borderRadius:8,
+                background:ev.active?"var(--g)":"#333",cursor:"pointer",transition:"background .15s",
+                display:"flex",alignItems:"center",justifyContent:ev.active?"flex-end":"flex-start",padding:"0 3px"}}>
+              <div style={{width:10,height:10,borderRadius:5,background:"#fff"}}/>
+            </div>
+            {/* rare badge */}
+            {ev.is_rare&&<div style={{position:"absolute",top:7,left:7,fontSize:10,color:"var(--y)"}}>⭐</div>}
+            <div style={{fontSize:32,lineHeight:1}}>{ev.emoji}</div>
+            <div style={{fontSize:11,fontWeight:700,textAlign:"center",lineHeight:1.3,color:"#fff",
+              overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+              {ev.label}
+            </div>
+            <div style={{fontSize:10,fontWeight:700,color:SLOK_TYPES[ev.slok_type]?.color||"var(--y)",marginTop:"auto"}}>
+              {slokLabel(ev)}
+            </div>
+            <div style={{fontSize:9,color:cc,textTransform:"uppercase",letterSpacing:1}}>
+              {CATEGORIES[ev.category]?.lbl||ev.category}
+            </div>
+          </div>;
+        })}
+
+        {/* Add new tile */}
+        <div onClick={addEvent}
+          style={{background:"#0e0e0e",border:"1.5px dashed #2a2a2a",borderRadius:14,padding:12,
+            cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",
+            justifyContent:"center",gap:8,minHeight:100,color:"#444"}}
+          onMouseOver={e=>e.currentTarget.style.borderColor="var(--g)"}
+          onMouseOut={e=>e.currentTarget.style.borderColor="#2a2a2a"}>
+          <div style={{fontSize:28,color:"var(--g)"}}>+</div>
+          <div style={{fontSize:11}}>Nieuw vakje</div>
+        </div>
+      </div>}
+    </>}
+
+    {tab==="stats"&&<>
+      <div className="neon-lbl" style={{marginBottom:12}}>RECENTE SESSIES</div>
+      {sessions.length===0&&<div style={{color:"#555",textAlign:"center",padding:32}}>Nog geen sessies gespeeld</div>}
+      {sessions.map(s=>(
+        <div key={s.id} style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:12,padding:14,marginBottom:10}}>
+          <div className="row gap8" style={{marginBottom:4}}>
+            <div style={{fontWeight:700,flex:1}}>{s.name||"Sessie"}</div>
+            <span className={`pill pill-${s.status==="finished"?"gray":s.status==="active"?"green":"gray"}`}>{s.status}</span>
+          </div>
+          <div style={{fontSize:12,color:"#555"}}>
+            {s.match_name&&<span>📍 {s.match_name} {s.match_score&&`(${s.match_score})`} · </span>}
+            {new Date(s.created_at).toLocaleDateString("nl")} {new Date(s.created_at).toLocaleTimeString("nl",{hour:"2-digit",minute:"2-digit"})}
+          </div>
+        </div>
+      ))}
+    </>}
+    </div>
+
+    {/* Edit sheet */}
+    {editEv&&<div style={{position:"fixed",inset:0,zIndex:900,background:"#000a",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+      onClick={()=>setEditEv(null)}>
+      <div onClick={e=>e.stopPropagation()}
+        style={{background:"#131313",borderRadius:"20px 20px 0 0",borderTop:"1px solid #2a2a2a",
+          padding:"20px 20px 40px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto"}}>
+
+        {/* Sheet header */}
+        <div className="row gap10" style={{marginBottom:16}}>
+          <div style={{fontSize:36}}>{editEv.emoji}</div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:800,fontSize:16}}>{editEv.label||"Nieuw vakje"}</div>
+            <div style={{fontSize:11,color:catColor[editEv.category]||"#555"}}>{CATEGORIES[editEv.category]?.lbl||editEv.category}</div>
+          </div>
+          <button onClick={()=>setEditEv(null)} style={{background:"none",border:"none",color:"#555",fontSize:22,cursor:"pointer"}}>✕</button>
+        </div>
+
+        <div className="neon-lbl mb8">EMOJI & NAAM</div>
+        <div className="row gap8" style={{marginBottom:12}}>
+          <input value={editEv.emoji} onChange={e=>setEditEv(v=>({...v,emoji:e.target.value}))}
+            style={{width:52,background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,
+              padding:"10px 6px",fontSize:22,textAlign:"center",color:"white"}}/>
+          <input className="inp" value={editEv.label} onChange={e=>setEditEv(v=>({...v,label:e.target.value}))}
+            placeholder="Naam vakje" style={{flex:1}}/>
+        </div>
+
+        <div className="neon-lbl mb8">BESCHRIJVING</div>
+        <textarea className="inp" value={editEv.description||""} onChange={e=>setEditEv(v=>({...v,description:e.target.value}))}
+          placeholder="Optionele toelichting..." rows={2}
+          style={{resize:"none",marginBottom:12,fontSize:13}}/>
+
+        <div className="row gap8" style={{marginBottom:12}}>
+          <div style={{flex:1}}>
+            <div className="neon-lbl mb8">CATEGORIE</div>
+            <select className="inp" value={editEv.category} onChange={e=>setEditEv(v=>({...v,category:e.target.value}))}>
+              {Object.entries(CATEGORIES).map(([k,cv])=><option key={k} value={k}>{cv.lbl}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="row gap8" style={{marginBottom:12}}>
+          <div style={{flex:"0 0 70px"}}>
+            <div className="neon-lbl mb8">AANTAL</div>
+            <input type="number" min={0} max={20} className="inp" value={editEv.slok}
+              onChange={e=>setEditEv(v=>({...v,slok:+e.target.value}))} style={{textAlign:"center"}}/>
+          </div>
+          <div style={{flex:1}}>
+            <div className="neon-lbl mb8">TYPE</div>
+            <select className="inp" value={editEv.slok_type} onChange={e=>setEditEv(v=>({...v,slok_type:e.target.value}))}>
+              {Object.entries(SLOK_TYPES).map(([k,sv])=><option key={k} value={k}>{sv.lbl}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Toggles */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:20}}>
+          {[
+            {key:"active",label:"Actief",emoji:"✅",color:"var(--g)"},
+            {key:"is_rare",label:"Zeldzaam",emoji:"⭐",color:"var(--y)"},
+            {key:"vibrate",label:"Trillen",emoji:"📳",color:"var(--b)"},
+          ].map(({key,label,emoji,color})=>(
+            <div key={key} onClick={()=>setEditEv(v=>({...v,[key]:!v[key]}))}
+              style={{background:editEv[key]?"#1a1a1a":"#111",border:`1.5px solid ${editEv[key]?color:"#2a2a2a"}`,
+                borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",transition:"all .15s"}}>
+              <div style={{fontSize:20,marginBottom:4}}>{emoji}</div>
+              <div style={{fontSize:11,fontWeight:700,color:editEv[key]?color:"#555"}}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="row gap8">
+          <button className="btn btn-ghost btn-sm" style={{color:"var(--r)",borderColor:"var(--r)33"}} onClick={deleteEvent}>
+            🗑 Verwijder
+          </button>
+          <button className="btn btn-green" style={{flex:1,padding:"13px"}} onClick={saveEdit} disabled={saving}>
+            {saving?"Opslaan...":"💾 Opslaan"}
+          </button>
+        </div>
+      </div>
+    </div>}
+
+    <ConfirmDialog
+      open={confirmDelete}
+      title={`"${editEv?.label}" verwijderen?`}
+      body="Dit vakje wordt permanent verwijderd uit alle toekomstige sessies."
+      confirmLabel="🗑 Ja, verwijderen"
+      danger={true}
+      onConfirm={doDeleteEvent}
+      onCancel={()=>setConfirmDelete(false)}/>
+
+    {/* Toast */}
+    {toast&&<div style={{position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",
+      background:"#1e1e1e",border:"1px solid #333",borderRadius:20,padding:"8px 20px",
+      fontSize:13,fontWeight:700,color:"#fff",zIndex:9999,pointerEvents:"none",whiteSpace:"nowrap"}}>
+      {toast}
+    </div>}
+  </div>;
+}
+
+// ── CreateSession ─────────────────────────────────────────────────────────────
+function CreateSessionScreen({onBack,onCreate,authUser}){
+  const defaultName=authUser?.user_metadata?.display_name||authUser?.email?.split("@")[0]||"";
+  const [name,setName]=useState("");
+  const [match,setMatch]=useState("");
+  const [teamA,setTeamA]=useState("");
+  const [teamB,setTeamB]=useState("");
+  const [gridSize,setGridSize]=useState(4);
+  const [pwd,setPwd]=useState("");
+  const [reqLogin,setReqLogin]=useState(false);
+  const [water,setWater]=useState(15);
+  const [mooi,setMooi]=useState(3);
+  const [cats,setCats]=useState(["veld","snel","var","trainer","supporters"]);
+  const [color,setColor]=useState("rood");
+  const [avatar,setAvatar]=useState("⚽");
+  const [myName,setMyName]=useState(defaultName);
+  const [predQs,setPredQs]=useState([]);
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+  const [events,setEvents]=useState([]);
+  const [evLoaded,setEvLoaded]=useState(false);
+
+  useEffect(()=>{
+    sb.from("wk_events").select("*").eq("active",true)
+      .then(({data})=>{setEvents(data||[]);setEvLoaded(true);});
+  },[]);
+
+  function toggleCat(k){
+    setCats(c=>c.includes(k)?c.filter(x=>x!==k):[...c,k]);
+  }
+
+  async function create(){
+    if(!myName.trim()){setErr("Vul jouw naam in");return;}
+    if(cats.length===0){setErr("Kies minimaal één categorie");return;}
+    const pool=events.filter(e=>cats.includes(e.category));
+    if(pool.length<gridSize*gridSize){
+      setErr(`Niet genoeg vakjes (${pool.length}) voor een ${gridSize}×${gridSize} kaart. Kies meer categorieën.`);return;
+    }
+    setLoading(true);setErr("");
+    const id=uid()+uid();
+    const{data:sess,error:se}=await sb.from("wk_sessions").insert({
+      id,name:name||"WK Sessie",match_name:match,categories:cats,
+      grid_size:gridSize,require_login:reqLogin,password:pwd||"",
+      status:"lobby",host_color:color,event_pool:pool,water_alarm:water,
+      mooiste_goal_nr:mooi,predictions_config:predQs,predictions_correct:{},
+      team_a:teamA.trim()||"Team A",team_b:teamB.trim()||"Team B"
+    }).select().single();
+    if(se){setErr(se.message);setLoading(false);return;}
+
+    const card=makeCard(pool,color,id,gridSize);
+    const counts=Array(gridSize*gridSize).fill(0);
+    const{data:player,error:pe}=await sb.from("wk_players").insert({
+      session_id:id,name:myName.trim(),color,avatar,card,counts,
+      bingo_lines:[],total_slok:0,achievements:[],is_host:true,
+      user_id:authUser?.id||null
+    }).select().single();
+    if(pe){setErr(pe.message);setLoading(false);return;}
+
+    onCreate(sess,player);
+  }
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
+    <div style={{padding:"16px 16px 0",borderBottom:"1px solid #1e1e1e",marginBottom:0}}>
+      <div className="row gap12">
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>← Terug</button>
+        <div className="anto" style={{fontSize:22,color:"var(--g)"}}>Nieuwe Sessie</div>
+      </div>
+    </div>
+
+    <div style={{flex:1,overflow:"auto",padding:"16px 16px 24px"}}>
+      <div className="section">
+        <div className="neon-lbl mb8">JOUW NAAM</div>
+        <input className="inp" value={myName} onChange={e=>setMyName(e.target.value)} placeholder="Naam…"/>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">JOUW KLEUR</div>
+        <div className="color-grid">
+          {Object.entries(COLORS).map(([k,c])=>(
+            <div key={k} className={`color-opt${color===k?" selected":""}`}
+              style={{background:c.a}} onClick={()=>setColor(k)} title={c.lbl}/>
+          ))}
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">AVATAR</div>
+        <div className="avatar-grid">
+          {AVATARS.map(a=>(
+            <div key={a} className={`av-opt${avatar===a?" selected":""}`} onClick={()=>setAvatar(a)}>{a}</div>
+          ))}
+        </div>
+      </div>
+
+      <hr className="divider"/>
+
+      <div className="section">
+        <div className="neon-lbl mb8">SESSIENAAM (optioneel)</div>
+        <input className="inp" value={name} onChange={e=>setName(e.target.value)} placeholder="Bijv. 'WK Avond bij Stefan'"/>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">WEDSTRIJD (optioneel)</div>
+        <input className="inp" value={match} onChange={e=>setMatch(e.target.value)} placeholder="Bijv. 🇳🇱 Nederland vs 🇧🇷 Brazilië"/>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">KAARTGROOTTE</div>
+        <div className="row gap8">
+          {[3,4].map(g=>(
+            <button key={g} className={`btn flex1${gridSize===g?" btn-green":" btn-ghost"}`} onClick={()=>setGridSize(g)}>
+              {g}×{g} {g===3?"(snel)":"(standaard)"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">CATEGORIEËN OP DE KAART</div>
+        <div className="cat-grid">
+          {Object.entries(CATEGORIES).map(([k,v])=>(
+            <div key={k} className={`cat-opt${cats.includes(k)?" selected":""}`} onClick={()=>toggleCat(k)}>
+              <div style={{fontWeight:700,fontSize:13}}>{v.lbl}</div>
+              <div style={{fontSize:11,color:"#555",marginTop:2}}>
+                {evLoaded?`${events.filter(e=>e.category===k&&e.active).length} vakjes`:v.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <hr className="divider"/>
+
+      <div className="section">
+        <div className="row gap12" style={{marginBottom:12}}>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:14}}>Login verplicht</div>
+            <div style={{fontSize:12,color:"#555"}}>Spelers moeten inloggen voor statistieken</div>
+          </div>
+          <Toggle checked={reqLogin} onChange={e=>setReqLogin(e.target.checked)}/>
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">WATER ALARM (slokken)</div>
+        <div className="row gap12">
+          <input type="range" min={5} max={30} value={water} onChange={e=>setWater(+e.target.value)} style={{flex:1}}/>
+          <span style={{fontWeight:800,color:"var(--g)",minWidth:30}}>{water}</span>
+        </div>
+        <div style={{fontSize:11,color:"#555",marginTop:4}}>
+          Na {water} slokken krijgt een speler een watermelding 💧
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">MOOISTE GOAL (voorspelling)</div>
+        <div className="row gap12">
+          <input type="range" min={1} max={6} value={mooi} onChange={e=>setMooi(+e.target.value)} style={{flex:1}}/>
+          <span style={{fontWeight:800,color:"var(--y)",minWidth:60}}>Goal #{mooi}</span>
+        </div>
+        <div style={{fontSize:11,color:"#555",marginTop:4}}>
+          Als host trigger je de Mooiste Goal bij de {mooi}e goal in de wedstrijd
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">🔮 VOORSPELLINGSVRAGEN (optioneel, max 5)</div>
+        <div style={{color:"#555",fontSize:12,marginBottom:10}}>Spelers vullen deze in vóór het spel. Selecteer 0–5 vragen.</div>
+
+        {/* Team names — needed for "team" type questions */}
+        <div className="row gap8" style={{marginBottom:12}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:11,color:"#555",marginBottom:4}}>TEAM A (thuis)</div>
+            <input className="inp inp-sm" value={teamA} onChange={e=>setTeamA(e.target.value)} placeholder="bijv. Nederland"/>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:11,color:"#555",marginBottom:4}}>TEAM B (uit)</div>
+            <input className="inp inp-sm" value={teamB} onChange={e=>setTeamB(e.target.value)} placeholder="bijv. Brazilië"/>
+          </div>
+        </div>
+
+        {PREDICTION_QUESTIONS.map(q=>{
+          const sel=predQs.includes(q.id);
+          const isTeam=q.type==="team";
+          return <div key={q.id}
+            style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,cursor:"pointer",
+              padding:"10px 12px",background:sel?"#0e1a0e":"transparent",
+              border:sel?"1px solid var(--g)":"1px solid #2a2a2a",borderRadius:10}}
+            onClick={()=>setPredQs(ps=>ps.includes(q.id)?ps.filter(x=>x!==q.id):ps.length>=5?ps:[...ps,q.id])}>
+            <div style={{fontSize:18}}>{q.emoji}</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:sel?700:400,color:sel?"#fff":"#ccc"}}>{q.q}</div>
+              <div style={{fontSize:11,color:"#555",marginTop:2}}>
+                {q.type==="team"?`🏳️ ${teamA||"Team A"} / ${teamB||"Team B"} / Gelijkspel`
+                 :q.type==="yesno"?"✅ Ja / Nee"
+                 :q.type==="choice"?q.choices?.join(" · ")
+                 :q.hint||"Vrije invoer"}
+              </div>
+            </div>
+            {sel&&<span style={{color:"var(--g)",fontSize:18,flexShrink:0}}>✓</span>}
+          </div>;
+        })}
+        {predQs.length>0&&<div style={{fontSize:12,color:"var(--g)",marginTop:4}}>✅ {predQs.length} vragen geselecteerd</div>}
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">WACHTWOORD (optioneel)</div>
+        <input className="inp" value={pwd} onChange={e=>setPwd(e.target.value)} placeholder="Leeg = geen wachtwoord"/>
+      </div>
+
+      {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12,padding:"10px 12px",background:"#1a0200",borderRadius:8}}>{err}</div>}
+
+      <button className="btn btn-green btn-block safe-bottom" style={{fontSize:17,padding:"16px 20px"}} onClick={create} disabled={loading}>
+        {loading?"Aanmaken…":"⚽ Sessie Aanmaken →"}
+      </button>
+    </div>
+  </div>;
+}
+
+// ── CardApproval ──────────────────────────────────────────────────────────────
+function CardApprovalScreen({sess,players,allEvents,onDone}){
+  const [cards,setCards]=useState(()=>players.reduce((m,p)=>({...m,[p.id]:[...(p.card||[])]}),{}));
+  const [approved,setApproved]=useState({});
+  const [swapping,setSwapping]=useState(null); // {playerId, idx}
+  const [saving,setSaving]=useState({});
+
+  function pickSwap(playerId,idx){
+    setSwapping(s=>s?.playerId===playerId&&s?.idx===idx?null:{playerId,idx});
+  }
+
+  async function replaceVakje(ev){
+    if(!swapping)return;
+    const{playerId,idx}=swapping;
+    const newCard=[...(cards[playerId]||[])];
+    newCard[idx]=ev;
+    setCards(c=>({...c,[playerId]:newCard}));
+    setApproved(a=>({...a,[playerId]:false}));
+    setSwapping(null);
+  }
+
+  async function approveCard(p){
+    setSaving(s=>({...s,[p.id]:true}));
+    await sb.from("wk_players").update({card:cards[p.id],card_approved:true}).eq("id",p.id);
+    setApproved(a=>({...a,[p.id]:true}));
+    setSaving(s=>({...s,[p.id]:false}));
+  }
+
+  const allApproved=players.every(p=>approved[p.id]);
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
+    <div style={{padding:"16px 16px 12px",borderBottom:"1px solid #1e1e1e"}}>
+      <div className="anto" style={{fontSize:20,color:"var(--y)"}}>📋 Kaarten Keuren</div>
+      <div style={{fontSize:12,color:"#555",marginTop:2}}>Tik een vakje aan om het te vervangen. Keur elke kaart goed.</div>
+    </div>
+
+    <div style={{flex:1,overflow:"auto",padding:"12px 16px"}}>
+      {players.map(p=>{
+        const C=COLORS[p.color]||COLORS.groen;
+        const card=cards[p.id]||[];
+        const isApproved=approved[p.id];
+        return <div key={p.id} className={`approval-card${isApproved?" approved":""}`}>
+          <div className="row gap8 mb8">
+            <PlayerAvatar p={p} size={32}/>
+            <div style={{flex:1,fontWeight:700}}>{p.name}</div>
+            {isApproved
+              ? <span className="pill pill-green">✓ Goedgekeurd</span>
+              : <button className="btn btn-sm btn-green" onClick={()=>approveCard(p)} disabled={saving[p.id]}>
+                  {saving[p.id]?"…":"✓ Akkoord"}
+                </button>}
+          </div>
+          <div className="mini-grid">
+            {card.map((ev,i)=>{
+              const isSel=swapping?.playerId===p.id&&swapping?.idx===i;
+              return <div key={i} className={`mini-cell${isSel?" selected-swap":""}`}
+                style={{background:C.cell,borderColor:isSel?"var(--y)":C.bd,color:C.tx}}
+                onClick={()=>pickSwap(p.id,i)}>
+                <span style={{fontSize:13}}>{ev.emoji||"⚽"}</span>
+                <span style={{fontSize:7,lineHeight:1.2,maxWidth:50,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{ev.label}</span>
+              </div>;
+            })}
+          </div>
+          {swapping?.playerId===p.id&&<>
+            <div style={{fontSize:11,color:"var(--y)",fontWeight:700,margin:"8px 0 6px"}}>Kies een vervangend vakje:</div>
+            <div style={{maxHeight:200,overflow:"auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+              {allEvents.map(ev=>(
+                <button key={ev.id} style={{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:8,padding:"6px 8px",color:"#fff",fontSize:11,textAlign:"left",cursor:"pointer",display:"flex",gap:6,alignItems:"center"}}
+                  onClick={()=>replaceVakje(ev)}>
+                  <span>{ev.emoji}</span>
+                  <span style={{flex:1,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{ev.label}</span>
+                </button>
+              ))}
+            </div>
+          </>}
+        </div>;
+      })}
+    </div>
+
+    <div style={{padding:"12px 16px",borderTop:"1px solid #1e1e1e"}}>
+      <button className="btn btn-green btn-block" onClick={onDone} disabled={!allApproved}>
+        {allApproved?"⚽ Start het Spel →":"Keur alle kaarten goed om te starten"}
+      </button>
+      <button className="btn btn-ghost btn-block btn-sm" style={{marginTop:8}} onClick={onDone}>
+        Overslaan (start zonder keuring)
+      </button>
+    </div>
+  </div>;
+}
+
+// ── HostLobby ─────────────────────────────────────────────────────────────────
+function HostLobbyScreen({sess,players,me,onStart,onUpdate,onEnd,addToast}){
+  const [matchSheet,setMatchSheet]=useState(false);
+  const [matchName,setMatchName]=useState(sess.match_name||"");
+  const [matchScore,setMatchScore]=useState(sess.match_score||"");
+  const [copied,setCopied]=useState(false);
+  const [confirmClose,setConfirmClose]=useState(false);
+  const [showApproval,setShowApproval]=useState(false);
+  const [allEvents,setAllEvents]=useState([]);
+
+  const url=`${location.origin}${location.pathname}?join=${sess.id}`;
+  const code=sess.id.toUpperCase().slice(0,6);
+
+  useEffect(()=>{
+    sb.from("wk_events").select("*").eq("active",true).then(({data})=>setAllEvents(data||[]));
+  },[]);
+
+  function copy(){
+    navigator.clipboard?.writeText(url).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});
+  }
+  async function saveMatch(){
+    await sb.from("wk_sessions").update({match_name:matchName,match_score:matchScore}).eq("id",sess.id);
+    onUpdate({...sess,match_name:matchName,match_score:matchScore});
+    setMatchSheet(false);
+    addToast("Wedstrijd info bijgewerkt","var(--g)");
+  }
+  async function startGame(){
+    await sb.from("wk_sessions").update({status:"active"}).eq("id",sess.id);
+    onStart();
+  }
+  async function endSess(){
+    setConfirmClose(true);
+  }
+  async function doEndSess(){
+    setConfirmClose(false);
+    await sb.from("wk_sessions").update({status:"finished"}).eq("id",sess.id);
+    onEnd();
+  }
+
+  if(showApproval) return <CardApprovalScreen
+    sess={sess} players={players.filter(p=>!p.is_host)} allEvents={allEvents}
+    onDone={()=>{setShowApproval(false);startGame();}}/>;
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"16px 16px 32px"}}>
+    <div className="row gap12 mb16">
+      <div className="anto" style={{fontSize:22,color:"var(--g)",flex:1}}>⚽ Lobby</div>
+      <div className="sess-code"><span className="sess-code-lbl">CODE</span><span className="sess-code-val">{code}</span></div>
+      <button className="btn btn-ghost btn-sm" style={{color:"var(--r)"}} onClick={endSess}>✕ Sluiten</button>
+    </div>
+
+    <div style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:16,padding:16,marginBottom:16,textAlign:"center"}}>
+      <div className="code-big" style={{marginBottom:8}}>{code}</div>
+      <div style={{fontSize:11,color:"#555",marginBottom:8,wordBreak:"break-all"}}>{url}</div>
+      <button className="btn btn-ghost btn-sm" onClick={copy}>
+        {copied?"✓ Gekopieerd!":"📋 Kopieer link"}
+      </button>
+    </div>
+
+    <div style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:14,padding:14,marginBottom:16}}>
+      <div className="row gap8 mb4">
+        <div style={{flex:1}}>
+          <div style={{fontWeight:700,fontSize:13}}>{sess.match_name||"⚽ Wedstrijd niet ingesteld"}</div>
+          {sess.match_score&&<div style={{color:"var(--y)",fontFamily:"Anton,Impact,sans-serif",fontSize:16,marginTop:2}}>{sess.match_score}</div>}
+        </div>
+        <button className="btn btn-ghost btn-sm" onClick={()=>setMatchSheet(true)}>✏️</button>
+      </div>
+    </div>
+
+    <div className="neon-lbl mb8">SPELERS ({players.length})</div>
+    {players.map(p=>(
+      <div key={p.id} className="p-row">
+        <PlayerAvatar p={p}/>
+        <div style={{flex:1}}>
+          <div style={{fontWeight:700}}>{p.name}</div>
+          <div style={{fontSize:11,color:"#555"}}>{COLORS[p.color]?.lbl}</div>
+        </div>
+        {p.is_host?<span className="pill pill-gold">HOST</span>:<span className="pill pill-green">✓</span>}
+      </div>
+    ))}
+
+    {players.length<2&&<div style={{fontSize:12,color:"#555",textAlign:"center",padding:"8px 0"}}>
+      Wacht op spelers… deel de link hierboven
+    </div>}
+
+    <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:10}}>
+      <button className="btn btn-ghost btn-block"
+        onClick={()=>setShowApproval(true)}
+        disabled={players.filter(p=>!p.is_host).length===0}
+        style={{opacity:players.filter(p=>!p.is_host).length===0?.4:1}}>
+        📋 Kaarten Keuren & Aanpassen
+        {players.filter(p=>!p.is_host).length===0&&<span style={{fontSize:11,color:"#555",display:"block",marginTop:2}}>Wacht op spelers om kaarten te keuren</span>}
+      </button>
+      <button className="btn btn-gold btn-block" style={{fontSize:17,padding:"16px 20px"}}
+        onClick={startGame} disabled={players.length<2}>
+        {players.length<2?"Wacht op spelers…":"🏁 Start Spel →"}
+      </button>
+    </div>
+
+    <Sheet open={matchSheet} onClose={()=>setMatchSheet(false)}>
+      <div className="anto" style={{fontSize:20,marginBottom:16,color:"var(--g)"}}>📍 Wedstrijd Info</div>
+      <div className="neon-lbl mb8">WEDSTRIJD</div>
+      <input className="inp" value={matchName} onChange={e=>setMatchName(e.target.value)}
+        placeholder="🇳🇱 Nederland vs 🇧🇷 Brazilië" style={{marginBottom:12}}/>
+      <div className="neon-lbl mb8">STAND</div>
+      <input className="inp" value={matchScore} onChange={e=>setMatchScore(e.target.value)}
+        placeholder="0 - 0" style={{marginBottom:20}}/>
+      <button className="btn btn-green btn-block" onClick={saveMatch}>Opslaan</button>
+    </Sheet>
+
+    <ConfirmDialog
+      open={confirmClose}
+      title="Lobby sluiten?"
+      body="De sessie wordt beëindigd en alle spelers worden verwijderd. Weet je het zeker?"
+      confirmLabel="✕ Ja, lobby sluiten"
+      danger={true}
+      onConfirm={doEndSess}
+      onCancel={()=>setConfirmClose(false)}/>
+  </div>;
+}
+
+// ── JoinScreen ────────────────────────────────────────────────────────────────
+function JoinScreen({initCode,onBack,onFound}){
+  const [code,setCode]=useState(initCode||"");
+  const [err,setErr]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  async function find(){
+    if(!code.trim()){setErr("Vul een code in");return;}
+    setLoading(true);setErr("");
+    const q=code.trim().toLowerCase();
+    const{data,error}=await sb.from("wk_sessions").select("*")
+      .or(`id.eq.${q},id.ilike.${q}%`).limit(1).single();
+    if(error||!data){
+      // try prefix search
+      const{data:d2}=await sb.from("wk_sessions").select("*").ilike("id",q+"%").limit(1).single();
+      if(!d2){setErr("Sessie niet gevonden. Controleer de code.");setLoading(false);return;}
+      onFound(d2);
+    } else {
+      onFound(data);
+    }
+    setLoading(false);
+  }
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"24px 20px"}}>
+    <button className="btn btn-ghost btn-sm" style={{alignSelf:"flex-start",marginBottom:24}} onClick={onBack}>← Terug</button>
+    <div className="anto" style={{fontSize:28,color:"var(--g)",marginBottom:4}}>🎟️ Doe Mee</div>
+    <div style={{color:"#555",fontSize:13,marginBottom:24}}>Voer de sessiecode in van de host</div>
+    <input className="inp" value={code} onChange={e=>setCode(e.target.value.toUpperCase())}
+      placeholder="CODE…" style={{textAlign:"center",letterSpacing:4,fontSize:22,marginBottom:12}}/>
+    {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12}}>{err}</div>}
+    <button className="btn btn-green btn-block" onClick={find} disabled={loading||!code.trim()}>
+      {loading?"Zoeken…":"Doorgaan →"}
+    </button>
+  </div>;
+}
+
+// ── PlayerSetup ───────────────────────────────────────────────────────────────
+function PlayerSetupScreen({sess,onBack,onJoin,authUser}){
+  const defaultName=authUser?.user_metadata?.display_name||authUser?.email?.split("@")[0]||"";
+  const [name,setName]=useState(defaultName);
+  const [color,setColor]=useState("blauw");
+  const [avatar,setAvatar]=useState("⚽");
+  const [pwd,setPwd]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [err,setErr]=useState("");
+
+  async function join(){
+    if(!name.trim()){setErr("Vul je naam in");return;}
+    if(sess.password&&sess.password!==pwd){setErr("Verkeerd wachtwoord");return;}
+    setLoading(true);setErr("");
+
+    const pool=sess.event_pool||[];
+    const card=makeCard(pool,color,sess.id,sess.grid_size||4);
+    const size=(sess.grid_size||4)*(sess.grid_size||4);
+    const counts=Array(size).fill(0);
+
+    const{data:player,error}=await sb.from("wk_players").insert({
+      session_id:sess.id,name:name.trim(),color,avatar,card,counts,
+      bingo_lines:[],total_slok:0,achievements:[],is_host:false,
+      user_id:authUser?.id||null,predictions:{}
+    }).select().single();
+
+    if(error){
+      setErr(error.message.includes("unique")?"Die kleur is al bezet, kies een andere":error.message);
+      setLoading(false);return;
+    }
+    onJoin(player);
+  }
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
+    <div style={{padding:"16px 16px 0"}}>
+      <div className="row gap12">
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>← Terug</button>
+        <div>
+          <div className="anto" style={{fontSize:20,color:"var(--g)"}}>{sess.name||"WK Sessie"}</div>
+          {sess.match_name&&<div style={{fontSize:12,color:"#555"}}>{sess.match_name}</div>}
+        </div>
+      </div>
+    </div>
+
+    <div style={{flex:1,overflow:"auto",padding:"16px 16px 24px"}}>
+      <div className="section">
+        <div className="neon-lbl mb8">JOUW NAAM</div>
+        <input className="inp" value={name} onChange={e=>setName(e.target.value)} placeholder="Naam…"/>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">KLEUR</div>
+        <div className="color-grid">
+          {Object.entries(COLORS).map(([k,c])=>(
+            <div key={k} className={`color-opt${color===k?" selected":""}`}
+              style={{background:c.a}} onClick={()=>setColor(k)}/>
+          ))}
+        </div>
+      </div>
+
+      <div className="section">
+        <div className="neon-lbl mb8">AVATAR</div>
+        <div className="avatar-grid">
+          {AVATARS.map(a=>(
+            <div key={a} className={`av-opt${avatar===a?" selected":""}`} onClick={()=>setAvatar(a)}>{a}</div>
+          ))}
+        </div>
+      </div>
+
+      {sess.password&&<div className="section">
+        <div className="neon-lbl mb8">WACHTWOORD</div>
+        <input className="inp" type="password" value={pwd} onChange={e=>setPwd(e.target.value)} placeholder="••••••••"/>
+      </div>}
+
+      {err&&<div style={{color:"var(--r)",fontSize:13,marginBottom:12,padding:"10px 12px",background:"#1a0200",borderRadius:8}}>{err}</div>}
+
+      <button className="btn btn-green btn-block" style={{fontSize:17,padding:"16px 20px"}} onClick={join} disabled={loading}>
+        {loading?"Bezig…":"⚽ Meedoen →"}
+      </button>
+    </div>
+  </div>;
+}
+
+// ── PredictionsScreen ─────────────────────────────────────────────────────────
+function PredictionsScreen({sess,player,onDone}){
+  const questions=(sess.predictions_config||[]).map(id=>PREDICTION_QUESTIONS.find(q=>q.id===id)).filter(Boolean);
+  const [answers,setAnswers]=useState({});
+  const [loading,setLoading]=useState(false);
+  const teamA=sess.team_a||"Team A";
+  const teamB=sess.team_b||"Team B";
+
+  if(!questions.length){onDone();return null;}
+
+  async function submit(){
+    setLoading(true);
+    await sb.from("wk_players").update({predictions:answers}).eq("id",player.id);
+    onDone();
+  }
+
+  function setAns(id,val){setAnswers(a=>({...a,[id]:val}));}
+  const allAnswered=questions.every(q=>(answers[q.id]||"").trim());
+
+  function QuestionInput({q}){
+    const val=answers[q.id]||"";
+    // Team choice
+    if(q.type==="team"){
+      const opts=[teamA,teamB,"Gelijkspel"];
+      return <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {opts.map(o=><button key={o}
+          style={{flex:1,minWidth:80,padding:"10px 8px",borderRadius:10,border:`2px solid ${val===o?"var(--g)":"#2a2a2a"}`,
+            background:val===o?"#0e1a0e":"#131313",color:val===o?"var(--g)":"#888",
+            fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
+          onClick={()=>setAns(q.id,o)}>{o}</button>)}
+      </div>;
+    }
+    // Ja/Nee
+    if(q.type==="yesno"){
+      return <div style={{display:"flex",gap:10}}>
+        {["Ja","Nee"].map(o=><button key={o}
+          style={{flex:1,padding:"12px",borderRadius:10,border:`2px solid ${val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#2a2a2a"}`,
+            background:val===o?(o==="Ja"?"#0e1a0e":"#1a0200"):"#131313",
+            color:val===o?(o==="Ja"?"var(--g)":"var(--r)"):"#888",
+            fontWeight:800,fontSize:16,cursor:"pointer",transition:"all .15s"}}
+          onClick={()=>setAns(q.id,o)}>{o==="Ja"?"✅ Ja":"❌ Nee"}</button>)}
+      </div>;
+    }
+    // Multiple choice
+    if(q.type==="choice"){
+      return <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+        {(q.choices||[]).map(o=><button key={o}
+          style={{padding:"8px 14px",borderRadius:8,border:`2px solid ${val===o?"var(--y)":"#2a2a2a"}`,
+            background:val===o?"#1a1400":"#131313",color:val===o?"var(--y)":"#888",
+            fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .15s"}}
+          onClick={()=>setAns(q.id,o)}>{o}</button>)}
+      </div>;
+    }
+    // Score (e.g. "2-1")
+    if(q.type==="score"){
+      return <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <input type="number" min={0} max={20} value={val.split("-")[0]||""}
+          onChange={e=>setAns(q.id,e.target.value+"-"+(val.split("-")[1]||"0"))}
+          style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
+            fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
+        <span style={{fontSize:22,color:"#555",fontWeight:800}}>–</span>
+        <input type="number" min={0} max={20} value={val.split("-")[1]||""}
+          onChange={e=>setAns(q.id,(val.split("-")[0]||"0")+"-"+e.target.value)}
+          style={{width:56,background:"#131313",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px",
+            fontSize:22,fontWeight:800,textAlign:"center",color:"white"}}/>
+        <div style={{fontSize:12,color:"#555",lineHeight:1.3}}>{teamA}<br/>{teamB}</div>
+      </div>;
+    }
+    // Default: text
+    return <input className="inp inp-sm" value={val} placeholder={q.hint||"Jouw antwoord"}
+      onChange={e=>setAns(q.id,e.target.value)}/>;
+  }
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"0 0 env(safe-area-inset-bottom,16px)"}}>
+    <div style={{padding:"16px 16px 12px",borderBottom:"1px solid #1e1e1e"}}>
+      <div className="anto" style={{fontSize:22,color:"var(--y)"}}>🔮 Voorspellingen</div>
+      <div style={{fontSize:13,color:"#555",marginTop:2}}>{teamA} vs {teamB} · {questions.length} vragen</div>
+    </div>
+    <div style={{flex:1,overflow:"auto",padding:"16px 16px 24px"}}>
+      {questions.map((q,i)=>{
+        const answered=(answers[q.id]||"").trim();
+        return <div key={q.id} className={`pred-q${answered?" answered":""}`}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+            <div style={{fontSize:22}}>{q.emoji}</div>
+            <div>
+              <div style={{fontSize:10,color:"#555",fontWeight:700,letterSpacing:1}}>VRAAG {i+1}</div>
+              <div style={{fontWeight:700,fontSize:14,color:answered?"#fff":"#ccc"}}>{q.q}</div>
+            </div>
+            {answered&&<div style={{marginLeft:"auto",color:"var(--g)",fontSize:18}}>✓</div>}
+          </div>
+          <QuestionInput q={q}/>
+        </div>;
+      })}
+      <div style={{color:"#555",fontSize:12,textAlign:"center",margin:"12px 0"}}>
+        {allAnswered?"✅ Alle vragen ingevuld!":
+         `${questions.filter(q=>(answers[q.id]||"").trim()).length}/${questions.length} ingevuld`}
+      </div>
+      <button className="btn btn-gold btn-block" onClick={submit} disabled={loading}>
+        {loading?"Bezig…":"Voorspellingen Opslaan →"}
+      </button>
+      <button className="btn btn-ghost btn-block btn-sm" style={{marginTop:8}} onClick={onDone}>
+        Overslaan (later invullen)
+      </button>
+    </div>
+  </div>;
+}
+
+// ── WaitScreen ────────────────────────────────────────────────────────────────
+function WaitScreen({sess,players,me}){
+  return <div className="screen center" style={{background:"#0a0a0a",padding:24,flexDirection:"column",gap:16}}>
+    <div className="spin" style={{width:48,height:48,borderTopColor:"var(--g)"}}/>
+    <div className="anto" style={{fontSize:24,color:"var(--g)"}}>Wachten op de host…</div>
+    {sess.match_name&&<div style={{textAlign:"center"}}>
+      <div style={{color:"#555",fontSize:13}}>{sess.match_name}</div>
+      {sess.match_score&&<div className="match-score" style={{marginTop:4}}>{sess.match_score}</div>}
+    </div>}
+    <div style={{width:"100%",maxWidth:320}}>
+      <div className="neon-lbl mb8">SPELERS ({players.length})</div>
+      {players.map(p=>(
+        <div key={p.id} className="p-row">
+          <PlayerAvatar p={p}/>
+          <div style={{flex:1,fontWeight:700}}>{p.name}</div>
+          {p.is_host&&<span className="pill pill-gold">HOST</span>}
+        </div>
+      ))}
+    </div>
+  </div>;
+}
+
+// ── PlayScreen ────────────────────────────────────────────────────────────────
+function PlayScreen({sess:initSess,players:initPlayers,me:initMe,onEnd,addToast}){
+  const [sess,setSess]=useState(initSess);
+  const [players,setPlayers]=useState(initPlayers);
+  const [me,setMe]=useState(initMe);
+  const [tab,setTab]=useState("kaart"); // kaart | scores | predictions | host
+  const [hostSheet,setHostSheet]=useState(false);
+  const [uitdelenSheet,setUitdelenSheet]=useState(null);
+  const [extraSheet,setExtraSheet]=useState(false);
+  const [matchSheet,setMatchSheet]=useState(false);
+  const [matchName,setMatchName]=useState(initSess.match_name||"");
+  const [matchScore,setMatchScore]=useState(initSess.match_score||"");
+  const [drinkAlert,setDrinkAlert]=useState(null); // {label, playerName, playerColor, bg}
+  const [drinkOut,setDrinkOut]=useState(false);
+  const [goalBanner,setGoalBanner]=useState(false);
+  const [hostAlert,setHostAlert]=useState(null);
+  const [flashCells,setFlashCells]=useState(new Set());
+  const [waterShown,setWaterShown]=useState(false);
+  const [extraTarget,setExtraTarget]=useState("");
+  const [extraEventId,setExtraEventId]=useState("");
+  const [allEvents,setAllEvents]=useState([]);
+  const [liveCards,setLiveCards]=useState({});
+  const [confirmEndOpen,setConfirmEndOpen]=useState(false);
+  const chRef=useRef(null);
+
+  const gs=sess.grid_size||4;
+  const lines=gs===4?LINES4:LINES3;
+  const isHost=me.is_host;
+  const C=COLORS[me.color]||COLORS.groen;
+
+  // load all events for host to pick from
+  useEffect(()=>{
+    if(isHost){
+      sb.from("wk_events").select("*").eq("active",true)
+        .then(({data})=>setAllEvents(data||[]));
+    }
+  },[isHost]);
+
+  // Wake lock
+  useEffect(()=>{reqWL();return()=>relWL();},[]);
+
+  // Realtime
+  useEffect(()=>{
+    const ch=sb.channel("wk-"+sess.id)
+      .on("postgres_changes",{event:"*",schema:"public",table:"wk_players",filter:`session_id=eq.${sess.id}`},({new:nr,old:or,eventType})=>{
+        if(eventType==="DELETE"){setPlayers(p=>p.filter(x=>x.id!==or?.id));return;}
+        if(nr.id===me.id){
+          if(nr.is_kicked){alert("Je bent verwijderd door de host.");onEnd();return;}
+          // Update own player — keep local version if it's newer (optimistic updates), but always sync host-set fields
+          setMe(prev=>(nr.version||0)>=(prev.version||0)?nr:{...prev,extra_vakjes:nr.extra_vakjes,predictions:nr.predictions});
+          setPlayers(prev=>prev.map(p=>p.id===nr.id?nr:p));
+          return;
+        }
+        setPlayers(prev=>{
+          const i=prev.findIndex(p=>p.id===nr.id);
+          return i===-1?[...prev,nr]:prev.map((p,ii)=>ii===i?nr:p);
+        });
+      })
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"wk_sessions",filter:`id=eq.${sess.id}`},({new:ns})=>{
+        setSess(ns);
+        setMatchName(ns.match_name||"");
+        setMatchScore(ns.match_score||"");
+        if(ns.status==="finished"){onEnd();}
+        if(ns.host_alert){
+          const prev=sess.host_alert;
+          if(!prev||ns.host_alert.ts>prev.ts){
+            const ha=ns.host_alert;
+            // Full-screen drink alert for adje/iedereen events (only for non-triggering players)
+            if(ha.type&&ha.playerName!==me?.name){
+              showDrinkAlert(ha.label,ha.playerName,ha.playerColor,ha.bg||"#2a0000",3500);
+            } else if(!ha.type){
+              setHostAlert(ha);
+              setTimeout(()=>setHostAlert(null),6000);
+            }
+          }
+        }
+      })
+      .subscribe();
+    chRef.current=ch;
+    return()=>{sb.removeChannel(ch);};
+  },[sess.id]);
+
+  // Water alarm
+  useEffect(()=>{
+    if(!waterShown&&me.total_slok>=(sess.water_alarm||15)){
+      setWaterShown(true);
+      addToast(`💧 ${me.total_slok} slokken op! Drink even een glas water 💧`,{dur:8000,color:"#06b6d4"});
+    }
+  },[me.total_slok,waterShown,sess.water_alarm]);
+
+  function showDrinkAlert(label,playerName,playerColor,bg,dur=3200){
+    buzz([100,50,200,50,300]);
+    setDrinkOut(false);
+    setDrinkAlert({label,playerName,playerColor,bg});
+    setTimeout(()=>{setDrinkOut(true);setTimeout(()=>setDrinkAlert(null),280);},dur);
+  }
+
+  async function tapCell(idx){
+    const ev=me.card[idx];
+    if(!ev)return;
+    await hitCell(idx,ev);
+  }
+
+  async function hitCell(idx,ev){
+    sClick();
+    if(ev.vibrate)buzz([150,50,150]);
+
+    const newCounts=[...(me.counts||[])];
+    newCounts[idx]=(newCounts[idx]||0)+1;
+    const addSlok=slokValue(ev);
+    const newTotal=(me.total_slok||0)+addSlok;
+    const newBL=checkBingo(newCounts,gs);
+    const prevBL=me.bingo_lines||[];
+    const newLines=newBL.filter(l=>!prevBL.some(pl=>pl.join()===l.join()));
+
+    // Drink alerts — broadcast to all via host_alert
+    if(ev.slok_type==="adje_iedereen"){
+      sAdje();
+      showDrinkAlert("IEDEREEN EEN ADJE! 🍺",me.name,C.a,"#2a0000",3500);
+      await sb.from("wk_sessions").update({host_alert:{type:"iedereen_adje",label:"IEDEREEN EEN ADJE! 🍺",playerName:me.name,playerColor:C.a,bg:"#2a0000",ts:Date.now()}}).eq("id",sess.id);
+    } else if(ev.slok_type==="dubbel_adje"){
+      sAdje();
+      showDrinkAlert(`💀 ${me.name} DUBBEL ADJE!`,me.name,C.a,"#1a0030",4000);
+      await sb.from("wk_sessions").update({host_alert:{type:"dubbel_adje",label:`💀 ${me.name} — DUBBEL ADJE!`,playerName:me.name,playerColor:C.a,bg:"#1a0030",ts:Date.now()}}).eq("id",sess.id);
+    } else if(ev.slok_type==="adje"){
+      sAdje();
+      showDrinkAlert(`🍺 ${me.name} — ADJE!`,me.name,C.a,"#2a0800",3200);
+      await sb.from("wk_sessions").update({host_alert:{type:"adje",label:`🍺 ${me.name} — ADJE!`,playerName:me.name,playerColor:C.a,bg:"#2a0800",ts:Date.now()}}).eq("id",sess.id);
+    }
+    if(ev.label.toLowerCase().includes("doelpunt")||ev.label.toLowerCase().includes("goal")){
+      setGoalBanner(true);sGoal();confetti(70,C.a);
+      setTimeout(()=>setGoalBanner(false),2500);
+    }
+    if(newLines.length>0){
+      sBingo();confetti(50);
+      newLines.forEach(line=>line.forEach(i=>{
+        setFlashCells(fc=>{const s=new Set(fc);s.add(i);return s;});
+        setTimeout(()=>setFlashCells(fc=>{const s=new Set(fc);s.delete(i);return s;}),700);
+      }));
+      addToast(`🏆 BINGO! ${newLines.length>1?"Meerdere rijen!":""}`,{dur:4000,color:C.a});
+    }
+    if(ev.slok_type==="uitdelen") setUitdelenSheet({idx,ev,slok:ev.slok||2});
+
+    const slokMsg=ev.slok_type==="adje"?"🍺 ADJE!":ev.slok_type==="adje_iedereen"?"🍺 IEDEREEN ADJE!":
+      ev.slok_type==="dubbel_adje"?"💀 DUBBEL ADJE!":ev.slok_type==="uitdelen"?"👉 Deel uit!":
+      `🍺 +${addSlok} slok${addSlok!==1?"ken":""}`;
+    addToast(slokMsg,{dur:2500,color:slokColor(ev)});
+
+    const updated={...me,counts:newCounts,total_slok:newTotal,bingo_lines:newBL,version:(me.version||0)+1};
+    setMe(updated);setPlayers(ps=>ps.map(p=>p.id===me.id?updated:p));
+    await sb.from("wk_players").update({counts:newCounts,total_slok:newTotal,bingo_lines:newBL,version:updated.version}).eq("id",me.id);
+  }
+
+  async function giveSlok(targetId,amount){
+    const t=players.find(p=>p.id===targetId);
+    if(!t)return;
+    const newSlok=(t.total_slok||0)+amount;
+    await sb.from("wk_players").update({total_slok:newSlok}).eq("id",targetId);
+    setPlayers(ps=>ps.map(p=>p.id===targetId?{...p,total_slok:newSlok}:p));
+    addToast(`👉 ${amount} slokken gegeven aan ${t.name}!`,{dur:3000,color:"var(--g)"});
+    setUitdelenSheet(null);
+  }
+
+  async function saveMatch(){
+    await sb.from("wk_sessions").update({match_name:matchName,match_score:matchScore}).eq("id",sess.id);
+    setMatchSheet(false);
+  }
+  async function triggerAlert(label,emoji){
+    await sb.from("wk_sessions").update({host_alert:{label,emoji,ts:Date.now()}}).eq("id",sess.id);
+  }
+  async function triggerGoal(){
+    const newCount=(sess.goal_count||0)+1;
+    await sb.from("wk_sessions").update({goal_count:newCount}).eq("id",sess.id);
+    const isMooiste=newCount===sess.mooiste_goal_nr;
+    if(isMooiste){
+      await triggerAlert("MOOISTE GOAL! 🌟","🌟");
+    } else {
+      await triggerAlert(`Goal #${newCount}! ⚽`,"⚽");
+    }
+  }
+  async function endSession(){
+    setConfirmEndOpen(true);
+  }
+  async function doEndSession(){
+    setConfirmEndOpen(false);
+    await sb.from("wk_sessions").update({status:"finished"}).eq("id",sess.id);
+  }
+  async function addExtraVakje(){
+    if(!extraTarget||!extraEventId)return;
+    const ev=allEvents.find(e=>e.id===extraEventId);
+    const target=players.find(p=>p.id===extraTarget);
+    if(!ev||!target)return;
+    const extra=[...(target.extra_vakjes||[]),ev];
+    await sb.from("wk_players").update({extra_vakjes:extra}).eq("id",extraTarget);
+    setExtraSheet(false);
+    addToast(`Extra vakje toegevoegd aan ${target.name}!`,{dur:3000,color:"var(--y)"});
+  }
+
+  async function tapExtra(ev,idx){
+    sClick();
+    if(ev.vibrate)buzz([150,50,150]);
+    const addSlok=slokValue(ev);
+    const newTotal=(me.total_slok||0)+addSlok;
+    const newExtra=(me.extra_vakjes||[]).filter((_,i)=>i!==idx);
+    const updated={...me,total_slok:newTotal,extra_vakjes:newExtra};
+    setMe(updated);
+    await sb.from("wk_players").update({total_slok:newTotal,extra_vakjes:newExtra}).eq("id",me.id);
+    addToast(`🍺 +${addSlok} (extra vakje)`,{dur:2000,color:"var(--y)"});
+  }
+
+  const sorted=[...players].sort((a,b)=>(b.total_slok||0)-(a.total_slok||0));
+
+  const sortedPlayers=[...players].sort((a,b)=>(b.total_slok||0)-(a.total_slok||0));
+  const maxSlok=Math.max(1,...players.map(p=>p.total_slok||0));
+  const code=sess.id.toUpperCase().slice(0,6);
+
+  return <div style={{display:"flex",flexDirection:"column",height:"100vh",background:C.bg,maxWidth:480,margin:"0 auto",position:"relative"}}>
+    {/* Match + player header */}
+    <div className="match-bar" style={{cursor:isHost?"pointer":"default"}} onClick={()=>isHost&&setMatchSheet(true)}>
+      <div style={{flex:1,minWidth:0}}>
+        <div className="match-name">{sess.match_name||"⚽ WK Bingo 2026"}</div>
+      </div>
+      {sess.match_score&&<div className="match-score">{sess.match_score}</div>}
+      <div className="sess-code"><span className="sess-code-lbl">CODE</span><span className="sess-code-val">{code}</span></div>
+    </div>
+    <div className="player-bar">
+      <PlayerAvatar p={me} size={32}/>
+      <div style={{flex:1}}>
+        <div style={{fontWeight:800,fontSize:13}}>{me.name}</div>
+        <div style={{fontSize:10,color:C.a,fontWeight:700}}>{COLORS[me.color]?.lbl}</div>
+      </div>
+      <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:20,color:"var(--y)"}}>🍺 {me.total_slok||0}</div>
+    </div>
+
+    {/* ── KAART TAB ── */}
+    {tab==="kaart"&&<div style={{flex:1,overflow:"auto",padding:"10px 12px 8px"}}>
+      <div className={`bingo-grid-${gs}`}>
+        {(me.card||[]).map((ev,i)=>{
+          const hit=(me.counts||[])[i]>0;
+          const hitCount=(me.counts||[])[i]||0;
+          return <div key={ev.id+i}
+            className={`cell${hit?" hit":""}${ev.is_rare&&!hit?" rare":""}${flashCells.has(i)?" bingo-ln":""}`}
+            style={{background:hit?C.a+"55":C.cell,borderColor:ev.is_rare&&!hit?"var(--y)":hit?C.a:C.bd,color:C.tx}}
+            onClick={()=>tapCell(i)}>
+            <div className="cell-emoji">{ev.emoji||"⚽"}</div>
+            <div className="cell-label" style={{color:hit?"#fff":C.tx,opacity:hit?.8:1}}>{ev.label}</div>
+            <div className="cell-slok" style={{color:slokColor(ev)}}>{slokLabel(ev)}</div>
+            {hit&&hitCount>1&&<div style={{position:"absolute",bottom:3,left:5,fontSize:9,fontWeight:900,opacity:.7}}>×{hitCount}</div>}
+          </div>;
+        })}
+      </div>
+      {(me.extra_vakjes||[]).length>0&&<div style={{marginTop:12}}>
+        <div className="neon-lbl mb8" style={{color:"var(--y)"}}>⭐ EXTRA VAKJES</div>
+        <div className="row gap8" style={{flexWrap:"wrap"}}>
+          {(me.extra_vakjes||[]).map((ev,i)=>(
+            <div key={ev.id+i} style={{background:C.cell,border:"2px solid var(--y)",borderRadius:12,padding:"8px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:6}}
+              onClick={()=>tapExtra(ev,i)}>
+              <span style={{fontSize:20}}>{ev.emoji}</span>
+              <div><div style={{fontSize:12,fontWeight:700}}>{ev.label}</div><div style={{fontSize:10,color:"var(--y)"}}>{slokLabel(ev)}</div></div>
+            </div>
+          ))}
+        </div>
+      </div>}
+    </div>}
+
+    {/* ── SCORES TAB ── */}
+    {tab==="scores"&&<div style={{flex:1,overflow:"auto",padding:"12px 16px"}}>
+      <div className="anto" style={{fontSize:18,color:"var(--y)",marginBottom:12}}>🏆 Ranglijst</div>
+      {sortedPlayers.map((p,i)=>{
+        const C2=COLORS[p.color]||COLORS.groen;
+        const pct=Math.round(((p.total_slok||0)/maxSlok)*100);
+        return <div key={p.id} className={`lb-row${p.id===me.id?" me":""}`} style={{marginBottom:8,borderColor:p.id===me.id?C.a:"#1e1e1e"}}>
+          <div className="lb-rank">{["🥇","🥈","🥉"][i]||i+1}</div>
+          <div style={{fontSize:26}}>{p.avatar||"⚽"}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontWeight:700,fontSize:13,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",color:C2.a}}>{p.name}</div>
+            <div className="beer-track" style={{marginTop:4}}><div className="beer-fill" style={{width:pct+"%",background:C2.a}}/></div>
+          </div>
+          <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:18,color:"var(--y)",minWidth:44,textAlign:"right"}}>🍺{p.total_slok||0}</div>
+        </div>;
+      })}
+    </div>}
+
+    {/* ── VOORSPELLINGEN TAB ── */}
+    {tab==="predictions"&&<div style={{flex:1,overflow:"auto",padding:"12px 16px"}}>
+      {(sess.predictions_config||[]).length===0
+        ? <div style={{display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,padding:32,height:"100%"}}>
+            <div style={{fontSize:40}}>🔮</div>
+            <div style={{color:"#555",fontSize:14}}>Geen voorspellingen voor deze sessie</div>
+          </div>
+        : <>
+          <div className="anto" style={{fontSize:18,color:"var(--y)",marginBottom:4}}>🔮 Jouw Voorspellingen</div>
+          <div style={{fontSize:12,color:"#555",marginBottom:12}}>Alleen jij ziet jouw antwoorden</div>
+          {(sess.predictions_config||[]).map((id,i)=>{
+            const q=PREDICTION_QUESTIONS.find(x=>x.id===id);
+            if(!q)return null;
+            const ans=(me.predictions||{})[q.id]||"";
+            const isCorrect=(sess.predictions_correct||{})[q.id]===true;
+            const isWrong=(sess.predictions_correct||{})[q.id]===false;
+            return <div key={q.id} className={`pred-q${ans?" answered":""}${isCorrect?" correct":""}${isWrong?" wrong":""}`}>
+              <div style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+                <div style={{fontSize:20}}>{q.emoji}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:11,color:"#555",marginBottom:2}}>Vraag {i+1}</div>
+                  <div style={{fontWeight:700,fontSize:13,marginBottom:6}}>{q.q}</div>
+                  <div style={{background:"#1c1c1c",borderRadius:8,padding:"8px 12px",fontSize:13,color:ans?"#fff":"#555"}}>{ans||"— niet ingevuld —"}</div>
+                  {isCorrect&&<div style={{color:"var(--g)",fontSize:12,marginTop:4,fontWeight:700}}>✅ Correct! Je mag uitdelen</div>}
+                  {isWrong&&<div style={{color:"#555",fontSize:12,marginTop:4}}>❌ Niet goed</div>}
+                </div>
+              </div>
+            </div>;
+          })}
+        </>}
+    </div>}
+
+    {/* ── HOST TAB ── */}
+    {tab==="host"&&isHost&&<div style={{flex:1,overflow:"auto",padding:"12px 16px"}}>
+      <div className="anto" style={{fontSize:18,color:"var(--g)",marginBottom:12}}>⚙️ Host Paneel</div>
+      <div className="section">
+        <div className="neon-lbl mb8">WEDSTRIJD & STAND</div>
+        <button className="btn btn-ghost btn-block btn-sm mb8" onClick={()=>setMatchSheet(true)}>✏️ Wedstrijd/Stand Aanpassen</button>
+        {sess.match_name&&<div style={{fontSize:13,color:"#555"}}>{sess.match_name}{sess.match_score&&` — ${sess.match_score}`}</div>}
+      </div>
+      <div className="section">
+        <div className="neon-lbl mb8">DOELPUNTEN</div>
+        <button className="btn btn-gold btn-block btn-sm mb4" onClick={()=>{triggerGoal();addToast("Goal!",{color:"var(--y)"});}}>
+          ⚽ Goal registreren (#{(sess.goal_count||0)+1})
+        </button>
+        <div style={{fontSize:11,color:"#555"}}>Mooiste goal = #{sess.mooiste_goal_nr||3} · Nu: {sess.goal_count||0}</div>
+      </div>
+      <div className="section">
+        <div className="neon-lbl mb8">MELDINGEN STUREN</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+          {[{l:"🟥 Rode kaart!",e:"🟥"},{l:"🟨 Gele kaart!",e:"🟨"},{l:"📺 VAR-check",e:"📺"},{l:"🎯 Vrije trap!",e:"🎯"},{l:"🍺 Iedereen drinkt!",e:"🍺"}].map(({l,e})=>(
+            <button key={l} className="btn btn-ghost btn-sm" style={{fontSize:12}} onClick={()=>triggerAlert(l,e)}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <div className="section">
+        <div className="neon-lbl mb8">EXTRA VAKJE</div>
+        <button className="btn btn-ghost btn-block btn-sm" onClick={()=>setExtraSheet(true)}>⭐ Extra Vakje aan Speler</button>
+      </div>
+      <div className="section">
+        <div className="neon-lbl mb8">LIVE KAARTEN SPELERS</div>
+        {players.filter(p=>!p.is_host).map(p=>{
+          const C2=COLORS[p.color]||COLORS.groen;
+          const hits=(p.counts||[]).filter(c=>c>0).length;
+          return <div key={p.id} style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:10,padding:10,marginBottom:8}}>
+            <div className="row gap8 mb6">
+              <PlayerAvatar p={p} size={28}/>
+              <span style={{fontWeight:700,flex:1,fontSize:13}}>{p.name}</span>
+              <span style={{fontSize:11,color:"var(--y)"}}>{hits} hits · 🍺{p.total_slok||0}</span>
+            </div>
+            <div className="mini-grid">
+              {(p.card||[]).map((ev,i)=>(
+                <div key={i} className="mini-cell"
+                  style={{background:(p.counts||[])[i]>0?C2.a+"66":C2.cell,color:C2.tx,borderColor:(p.counts||[])[i]>0?C2.a:C2.bd}}>
+                  <span style={{fontSize:11}}>{ev.emoji}</span>
+                </div>
+              ))}
+            </div>
+          </div>;
+        })}
+      </div>
+      {(sess.predictions_config||[]).length>0&&<div className="section">
+        <div className="neon-lbl mb8">VOORSPELLINGEN OVERZICHT</div>
+        {(sess.predictions_config||[]).map(id=>{
+          const q=PREDICTION_QUESTIONS.find(x=>x.id===id);
+          if(!q)return null;
+          return <div key={id} style={{background:"#131313",border:"1px solid #1e1e1e",borderRadius:10,padding:10,marginBottom:8}}>
+            <div style={{fontWeight:700,fontSize:12,marginBottom:6}}>{q.emoji} {q.q}</div>
+            {players.filter(p=>!p.is_host).map(p=>(
+              <div key={p.id} className="row gap6" style={{marginBottom:4}}>
+                <span style={{fontSize:12}}>{p.avatar}</span>
+                <span style={{fontSize:11,color:COLORS[p.color]?.a,flex:1}}>{p.name}</span>
+                <span style={{fontSize:11,color:"#fff"}}>{(p.predictions||{})[id]||<span style={{color:"#555"}}>—</span>}</span>
+                <button style={{background:"none",border:"1px solid var(--g)",borderRadius:6,padding:"2px 6px",fontSize:10,color:"var(--g)",cursor:"pointer"}}
+                  onClick={async()=>{const nc={...(sess.predictions_correct||{}),[id]:true};await sb.from("wk_sessions").update({predictions_correct:nc}).eq("id",sess.id);setSess(s=>({...s,predictions_correct:nc}));}}>✓</button>
+              </div>
+            ))}
+          </div>;
+        })}
+      </div>}
+      <hr className="divider"/>
+      <button className="btn btn-block btn-sm" style={{background:"var(--r)22",border:"1px solid var(--r)55",color:"var(--r)",padding:"12px"}} onClick={endSession}>🏁 Sessie Beëindigen</button>
+    </div>}
+
+    {/* End session confirm dialog */}
+    <ConfirmDialog
+      open={confirmEndOpen}
+      title="Sessie beëindigen?"
+      body={`Alle spelers worden naar het eindscherm gestuurd. Dit kan niet ongedaan worden gemaakt.`}
+      confirmLabel="🏁 Ja, beëindigen"
+      danger={true}
+      onConfirm={doEndSession}
+      onCancel={()=>setConfirmEndOpen(false)}/>
+
+    {/* Bottom navigation */}
+    <div className="bottom-nav">
+      <button className={`nav-btn${tab==="kaart"?" active":""}`} onClick={()=>setTab("kaart")}>
+        <div className="nav-btn-icon">⚽</div><div className="nav-btn-lbl">Kaart</div>
+      </button>
+      <button className={`nav-btn${tab==="scores"?" active":""}`} onClick={()=>setTab("scores")}>
+        <div className="nav-btn-icon">🏆</div><div className="nav-btn-lbl">Scores</div>
+      </button>
+      <button className={`nav-btn${tab==="predictions"?" active":""}`} onClick={()=>setTab("predictions")}>
+        <div className="nav-btn-icon">🔮</div><div className="nav-btn-lbl">Voorspel</div>
+      </button>
+      {isHost&&<button className={`nav-btn${tab==="host"?" active":""}`} onClick={()=>setTab("host")}>
+        <div className="nav-btn-icon">⚙️</div><div className="nav-btn-lbl">Host</div>
+      </button>}
+    </div>
+
+    {/* Full-screen drink alert */}
+    {drinkAlert&&<div className={`drink-alert${drinkOut?" drink-alert-out":""}`} style={{background:drinkAlert.bg||"#2a0000"}}
+      onClick={()=>{setDrinkOut(true);setTimeout(()=>setDrinkAlert(null),280);}}>
+      <div style={{fontSize:80}}>🍺</div>
+      <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:32,color:drinkAlert.playerColor||"#fff",textAlign:"center",lineHeight:1.1}}>
+        {drinkAlert.label}
+      </div>
+      <div style={{fontSize:14,color:"#ffffff88",marginTop:8}}>Tik om te sluiten</div>
+    </div>}
+
+    {/* GOAL banner */}
+    {goalBanner&&<div style={{position:"fixed",top:"30%",left:"50%",transform:"translateX(-50%)",zIndex:1500,animation:"goalBoom .4s ease-out",fontFamily:"Anton,Impact,sans-serif",fontSize:48,color:"var(--y)",textShadow:"0 0 30px var(--y)",pointerEvents:"none",whiteSpace:"nowrap"}}>
+      ⚽ DOELPUNT!
+    </div>}
+
+    {/* Host info alert (non-drink) */}
+    {hostAlert&&<div className="host-alert">
+      <div style={{fontSize:32,marginBottom:4}}>{hostAlert.emoji||"📢"}</div>
+      <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:17,color:"var(--y)"}}>{hostAlert.label}</div>
+      <div style={{fontSize:11,color:"#555",marginTop:4}}>Check je kaart!</div>
+    </div>}
+
+    {/* Uitdelen sheet */}
+    <Sheet open={!!uitdelenSheet} onClose={()=>setUitdelenSheet(null)}>
+      <div className="anto" style={{fontSize:20,marginBottom:4,color:"var(--g)"}}>{uitdelenSheet?.ev?.emoji} Uitdelen</div>
+      <div style={{color:"#555",fontSize:13,marginBottom:16}}>Kies wie er {uitdelenSheet?.ev?.slok||2} slokken moet drinken</div>
+      {players.filter(p=>p.id!==me.id).map(p=>(
+        <div key={p.id} className="p-row" style={{cursor:"pointer"}} onClick={()=>giveSlok(p.id,uitdelenSheet?.ev?.slok||2)}>
+          <PlayerAvatar p={p}/><div style={{flex:1,fontWeight:700}}>{p.name}</div>
+          <span style={{color:"var(--y)",fontFamily:"Anton,Impact,sans-serif"}}>🍺 {p.total_slok||0}</span>
+        </div>
+      ))}
+      {players.length<=1&&<div style={{color:"#555",textAlign:"center",padding:16}}>Geen andere spelers</div>}
+    </Sheet>
+
+    {/* Match edit sheet */}
+    <Sheet open={matchSheet} onClose={()=>setMatchSheet(false)}>
+      <div className="anto" style={{fontSize:20,marginBottom:16,color:"var(--g)"}}>📍 Wedstrijd</div>
+      <div className="neon-lbl mb8">WEDSTRIJD</div>
+      <input className="inp" value={matchName} onChange={e=>setMatchName(e.target.value)} placeholder="🇳🇱 Nederland vs 🇧🇷 Brazilië" style={{marginBottom:12}}/>
+      <div className="neon-lbl mb8">STAND</div>
+      <input className="inp" value={matchScore} onChange={e=>setMatchScore(e.target.value)} placeholder="0 - 0" style={{marginBottom:20}}/>
+      <button className="btn btn-green btn-block" onClick={saveMatch}>Opslaan</button>
+    </Sheet>
+
+    {/* Extra vakje sheet */}
+    <Sheet open={extraSheet} onClose={()=>setExtraSheet(false)}>
+      <div className="anto" style={{fontSize:20,marginBottom:16,color:"var(--y)"}}>⭐ Extra Vakje</div>
+      <div className="neon-lbl mb8">SPELER</div>
+      <select className="inp inp-sm" style={{marginBottom:12}} value={extraTarget} onChange={e=>setExtraTarget(e.target.value)}>
+        <option value="">— Kies speler —</option>
+        {players.filter(p=>p.id!==me.id).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+      <div className="neon-lbl mb8">VAKJE</div>
+      <select className="inp inp-sm" style={{marginBottom:20}} value={extraEventId} onChange={e=>setExtraEventId(e.target.value)}>
+        <option value="">— Kies vakje —</option>
+        {allEvents.map(e=><option key={e.id} value={e.id}>{e.emoji} {e.label} ({slokLabel(e)})</option>)}
+      </select>
+      <button className="btn btn-gold btn-block" onClick={addExtraVakje} disabled={!extraTarget||!extraEventId}>⭐ Toevoegen</button>
+    </Sheet>
+  </div>;
+}
+
+// ── WinnerScreen ──────────────────────────────────────────────────────────────
+function WinnerScreen({sess,players,me,onHome,onRematch}){
+  const sorted=[...players].sort((a,b)=>(b.total_slok||0)-(a.total_slok||0));
+  const top=sorted.slice(0,3);
+  const C=COLORS[me.color]||COLORS.groen;
+
+  useEffect(()=>{sFanfare();confetti(100,C.a);},[]);
+
+  return <div className="screen" style={{background:"#0a0a0a",padding:"24px 20px 40px",overflowY:"auto"}}>
+    <div style={{textAlign:"center",marginBottom:24}}>
+      <div style={{fontSize:64}}>🏆</div>
+      <div className="anto" style={{fontSize:32,color:"var(--y)"}}>EINDSTAND</div>
+      {sess.match_name&&<div style={{color:"#555",fontSize:14,marginTop:4}}>{sess.match_name}</div>}
+    </div>
+
+    <div className="podium-wrap" style={{marginBottom:24}}>
+      {[1,0,2].map(pos=>{
+        const p=top[pos];
+        if(!p)return <div key={pos} style={{flex:1}}/>;
+        const heights=[90,120,70];
+        const C2=COLORS[p.color]||COLORS.groen;
+        return <div key={p.id} className="podium-col">
+          <div style={{fontSize:28}}>{p.avatar||"⚽"}</div>
+          <div style={{fontSize:12,fontWeight:800,color:C2.a,textAlign:"center"}}>{p.name}</div>
+          <div style={{background:C2.a,borderRadius:"8px 8px 0 0",width:"100%",height:heights[pos],display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:8}}>
+            <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:20,color:C2.bg}}>🍺 {p.total_slok||0}</div>
+            <div style={{fontSize:10,color:C2.bg,opacity:.8}}>slokken</div>
+          </div>
+          <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:22,color:C2.a,textAlign:"center"}}>{["🥈","🥇","🥉"][pos]}</div>
+        </div>;
+      })}
+    </div>
+
+    <div className="neon-lbl mb12">VOLLEDIGE RANGLIJST</div>
+    {sorted.map((p,i)=>{
+      const C2=COLORS[p.color]||COLORS.groen;
+      const bingoCount=(p.bingo_lines||[]).length;
+      return <div key={p.id} className="p-row" style={{borderColor:p.id===me.id?C.a:"#1e1e1e"}}>
+        <div style={{fontFamily:"Anton,Impact,sans-serif",fontSize:20,color:"#555",width:24,textAlign:"center"}}>{i+1}</div>
+        <PlayerAvatar p={p}/>
+        <div style={{flex:1}}>
+          <div style={{fontWeight:700}}>{p.name}</div>
+          <div style={{fontSize:11,color:"#555"}}>
+            {bingoCount>0&&`🏆 ${bingoCount} bingo · `}🍺 {p.total_slok||0} slokken
+          </div>
+        </div>
+      </div>;
+    })}
+
+    <div style={{display:"flex",gap:10,marginTop:24}}>
+      {me.is_host&&<button className="btn btn-ghost flex1" onClick={onRematch}>🔄 Nieuwe Ronde</button>}
+      <button className="btn btn-green flex1" onClick={onHome}>🏠 Home</button>
+    </div>
+  </div>;
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App(){
+  const [screen,setScreen]=useState("loading");
+  const [authUser,setAuthUser]=useState(null);
+  const [pwRecovery,setPwRecovery]=useState(false);
+  const [sess,setSess]=useState(null);
+  const [players,setPlayers]=useState([]);
+  const [me,setMe]=useState(null);
+  const [joinCode,setJoinCode]=useState("");
+  const [foundSess,setFoundSess]=useState(null);
+  const {toasts,add:addToast}=useToasts();
+  const chRef=useRef(null);
+
+  // Restore active session for logged-in user (called after login)
+  async function tryRestoreSession(user){
+    if(!user)return false;
+    try{
+      const{data:rows}=await sb.from("wk_players")
+        .select("*, wk_sessions!inner(*)")
+        .eq("user_id",user.id)
+        .neq("wk_sessions.status","finished")
+        .order("created_at",{ascending:false})
+        .limit(1);
+      const row=rows?.[0];
+      if(!row)return false;
+      const sessionData=row.wk_sessions;
+      const{data:allPlayers}=await sb.from("wk_players").select("*").eq("session_id",sessionData.id);
+      setSess(sessionData);
+      setPlayers(allPlayers||[row]);
+      setMe(row);
+      if(sessionData.status==="active"){setScreen("play");}
+      else if(sessionData.status==="lobby"&&row.is_host){setScreen("lobby");}
+      else{setScreen("wait");}
+      return true;
+    }catch(e){return false;}
+  }
+
+  // Auth + URL param
+  useEffect(()=>{
+    const p=new URLSearchParams(location.search);
+    const j=p.get("join");
+    if(j)setJoinCode(j);
+
+    // Handle password recovery link
+    const hash=window.location.hash;
+    if(hash.includes("type=recovery")){
+      setPwRecovery(true);
+      history.replaceState(null,"",window.location.pathname+window.location.search);
+    }
+
+    sb.auth.getSession().then(async({data})=>{
+      const user=data.session?.user||null;
+      setAuthUser(user);
+      if(hash.includes("type=recovery")){setScreen("login");return;}
+      if(j){setScreen("join");return;}
+      if(user){
+        const restored=await tryRestoreSession(user);
+        if(!restored)setScreen("home");
+      } else {
+        setScreen("login");
+      }
+    });
+
+    const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
+      const user=s?.user||null;
+      setAuthUser(user);
+      if(event==="PASSWORD_RECOVERY"){
+        setPwRecovery(true);
+        setScreen("login");
+      }
+    });
+    return()=>subscription.unsubscribe();
+  },[]);
+
+  async function handleLogin(user){
+    setAuthUser(user);
+    const restored=await tryRestoreSession(user);
+    if(!restored)setScreen("home");
+  }
+
+  async function handleLogout(){
+    await sb.auth.signOut();
+    setAuthUser(null);
+    goHome();
+    setScreen("login");
+  }
+
+  // Lobby realtime (when host is in lobby)
+  useEffect(()=>{
+    if(screen!=="lobby"||!sess)return;
+    const ch=sb.channel("wk-lobby-"+sess.id)
+      .on("postgres_changes",{event:"*",schema:"public",table:"wk_players",filter:`session_id=eq.${sess.id}`},({new:nr,old:or,eventType})=>{
+        if(eventType==="DELETE"){setPlayers(p=>p.filter(x=>x.id!==or?.id));return;}
+        setPlayers(prev=>{
+          const i=prev.findIndex(p=>p.id===nr.id);
+          return i===-1?[...prev,nr]:prev.map((p,ii)=>ii===i?nr:p);
+        });
+      })
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"wk_sessions",filter:`id=eq.${sess.id}`},({new:ns})=>{
+        setSess(ns);
+        if(ns.status==="active"){
+          const myPlayer=players.find(p=>p.is_host);
+          if(myPlayer){setMe(myPlayer);setScreen("play");}
+        }
+      })
+      .subscribe();
+    chRef.current=ch;
+    return()=>{sb.removeChannel(ch);};
+  },[screen,sess?.id]);
+
+  // Wait screen realtime
+  useEffect(()=>{
+    if(screen!=="wait"||!sess||!me)return;
+    const ch=sb.channel("wk-wait-"+sess.id)
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"wk_sessions",filter:`id=eq.${sess.id}`},({new:ns})=>{
+        setSess(ns);
+        if(ns.status==="active"){setScreen("play");}
+      })
+      .on("postgres_changes",{event:"*",schema:"public",table:"wk_players",filter:`session_id=eq.${sess.id}`},({new:nr,eventType,old:or})=>{
+        if(eventType==="DELETE"){setPlayers(p=>p.filter(x=>x.id!==or?.id));return;}
+        setPlayers(prev=>{
+          const i=prev.findIndex(p=>p.id===nr.id);
+          return i===-1?[...prev,nr]:prev.map((p,ii)=>ii===i?nr:p);
+        });
+      })
+      .subscribe();
+    return()=>{sb.removeChannel(ch);};
+  },[screen,sess?.id,me?.id]);
+
+  function goHome(){
+    setSess(null);setPlayers([]);setMe(null);setFoundSess(null);
+    if(chRef.current){sb.removeChannel(chRef.current);chRef.current=null;}
+    setScreen("home");
+  }
+
+  async function handleRematch(){
+    if(!sess||!me)return;
+    // Reset session
+    await sb.from("wk_sessions").update({status:"lobby",goal_count:0,host_alert:null}).eq("id",sess.id);
+    // Refresh players
+    const{data:ps}=await sb.from("wk_players").select("*").eq("session_id",sess.id);
+    if(ps){
+      // reset all players
+      await Promise.all(ps.map(p=>sb.from("wk_players").update({counts:Array(sess.grid_size*sess.grid_size).fill(0),bingo_lines:[],total_slok:0,achievements:[]}).eq("id",p.id)));
+      setPlayers(ps);
+    }
+    setSess(prev=>({...prev,status:"lobby",goal_count:0}));
+    const myP=me.is_host?{...me,counts:Array(sess.grid_size*sess.grid_size).fill(0),bingo_lines:[],total_slok:0}:me;
+    setMe(myP);
+    setScreen("lobby");
+  }
+
+  // Render
+  if(screen==="loading") return <div style={{minHeight:"100vh",background:"#0a0a0a",display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <div className="spin"/>
+  </div>;
+
+  if(screen==="login") return <>
+    <LoginScreen onLogin={handleLogin} pwRecovery={pwRecovery} onPwRecoveryDone={()=>setPwRecovery(false)}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="home") return <>
+    <HomeScreen authUser={authUser} onCreate={()=>setScreen("create")}
+      onJoin={c=>{setJoinCode(c);setScreen("join");}}
+      onAdmin={()=>authUser?.email===ADMIN_EMAIL?setScreen("admin"):setScreen("admin-login")} joinCode={joinCode}
+      onLogout={handleLogout}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="admin-login") return <>
+    <AdminLoginScreen onBack={()=>{setPwRecovery(false);setScreen("home");}}
+      onSuccess={u=>{setAuthUser(u);setScreen("admin");}}
+      pwRecovery={pwRecovery} onPwRecoveryDone={()=>setPwRecovery(false)}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="admin") return <>
+    <AdminPanelScreen user={authUser} onBack={()=>setScreen("home")}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="create") return <>
+    <CreateSessionScreen onBack={()=>setScreen("home")} authUser={authUser}
+      onCreate={(s,p)=>{setSess(s);setPlayers([p]);setMe(p);setScreen("lobby");}}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="lobby") return <>
+    <HostLobbyScreen sess={sess} players={players} me={me}
+      onStart={()=>{const p=players.find(x=>x.id===me.id);if(p)setMe(p);setScreen("play");}}
+      onUpdate={s=>setSess(s)} onEnd={goHome} addToast={(m,c)=>addToast(m,{color:c})}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="join") return <>
+    <JoinScreen initCode={joinCode} onBack={()=>setScreen("home")}
+      onFound={s=>{setFoundSess(s);setScreen("player-setup");}}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="player-setup") return <>
+    <PlayerSetupScreen sess={foundSess} onBack={()=>setScreen("join")} authUser={authUser}
+      onJoin={async(p)=>{
+        setSess(foundSess);
+        const{data:ps}=await sb.from("wk_players").select("*").eq("session_id",foundSess.id);
+        setPlayers(ps||[p]);setMe(p);
+        // if session has predictions, show predictions screen first
+        if((foundSess.predictions_config||[]).length>0){setScreen("predictions");}
+        else setScreen("wait");
+      }}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="predictions") return <>
+    <PredictionsScreen sess={sess||foundSess} player={me}
+      onDone={()=>setScreen("wait")}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="wait") return <>
+    <WaitScreen sess={sess} players={players} me={me}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="play") return <>
+    <PlayScreen sess={sess} players={players} me={me}
+      onEnd={()=>{
+        sb.from("wk_players").select("*").eq("session_id",sess.id).then(({data})=>{
+          if(data)setPlayers(data);
+        });
+        setScreen("winner");
+      }}
+      addToast={(m,opts)=>addToast(m,typeof opts==="string"?{color:opts}:opts)}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  if(screen==="winner") return <>
+    <WinnerScreen sess={sess} players={players} me={me} onHome={goHome} onRematch={handleRematch}/>
+    <ToastList toasts={toasts}/>
+  </>;
+
+  return null;
+}
+
+ReactDOM.render(<App/>, document.getElementById("root"));
+</script>
+</body>
+</html>
